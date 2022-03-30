@@ -46,7 +46,7 @@ public class SetupProfileActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         getSupportActionBar().hide();
-        
+
         binding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
