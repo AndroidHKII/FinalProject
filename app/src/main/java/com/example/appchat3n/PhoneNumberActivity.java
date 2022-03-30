@@ -15,10 +15,12 @@ public class PhoneNumberActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_phone_number);
-
         binding = ActivityPhoneNumberBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        getSupportActionBar().hide();
+
+        binding.phoneBox.requestFocus();
 
         binding.continueBtn.setOnClickListener(new View.OnClickListener() {
             @Override

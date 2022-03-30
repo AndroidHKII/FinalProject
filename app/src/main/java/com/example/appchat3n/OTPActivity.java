@@ -3,7 +3,10 @@ package com.example.appchat3n;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.example.appchat3n.databinding.ActivityOtpactivityBinding;
@@ -23,7 +26,10 @@ public class OTPActivity extends AppCompatActivity {
 
     ActivityOtpactivityBinding binding;
     FirebaseAuth auth;
+
     String verificationId;
+
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +37,14 @@ public class OTPActivity extends AppCompatActivity {
         binding = ActivityOtpactivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Sending OTP...");
+        dialog.setCancelable(false);
+        dialog.show();
+
         auth = FirebaseAuth.getInstance();
+
+        getSupportActionBar().hide();
 
         String phoneNumber = getIntent().getStringExtra("phoneNumber");
 
@@ -55,7 +68,12 @@ public class OTPActivity extends AppCompatActivity {
                     @Override
                     public void onCodeSent(@NonNull String verifyId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                         super.onCodeSent(verifyId, forceResendingToken);
+                        dialog.dismiss();
                         verificationId = verifyId;
+
+                        InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                        binding.otpView.requestFocus();
                     }
                 }).build();
 
