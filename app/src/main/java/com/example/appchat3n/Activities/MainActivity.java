@@ -1,17 +1,17 @@
-package com.example.appchat3n;
+package com.example.appchat3n.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.appchat3n.R;
+import com.example.appchat3n.Models.User;
+import com.example.appchat3n.Adapters.UsersAdapter;
 import com.example.appchat3n.databinding.ActivityMainBinding;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;

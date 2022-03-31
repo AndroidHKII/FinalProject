@@ -11,17 +11,20 @@
         android:theme="@style/Theme.AppChat3N"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".SetupProfileActivity"
+            android:name=".Activities.ChatActivity"
             android:exported="false" />
         <activity
-            android:name=".OTPActivity"
+            android:name=".Activities.SetupProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.OTPActivity"
             android:exported="false"
             android:windowSoftInputMode="stateVisible" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".PhoneNumberActivity"
+            android:name=".Activities.PhoneNumberActivity"
             android:exported="true"
             android:windowSoftInputMode="stateVisible">
             <intent-filter>

@@ -1,6 +1,7 @@
-package com.example.appchat3n;
+package com.example.appchat3n.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.appchat3n.Activities.ChatActivity;
+import com.example.appchat3n.R;
+import com.example.appchat3n.Models.User;
 import com.example.appchat3n.databinding.RowConversationBinding;
 
 import java.util.ArrayList;
@@ -41,6 +45,15 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
                 .placeholder(R.drawable.avatar)
                 .into(holder.binding.profile);
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra("name", user.getName());
+                intent.putExtra("uid", user.getUid());
+                context.startActivity(intent);
+            }
+        });
 
     }
 
