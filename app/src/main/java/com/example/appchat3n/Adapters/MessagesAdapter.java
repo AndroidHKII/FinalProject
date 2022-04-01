@@ -91,7 +91,7 @@ public class MessagesAdapter extends RecyclerView.Adapter{
             }
 
             message.setFeeling(pos);
-
+//Bi null cho nay
             FirebaseDatabase.getInstance().getReference()
                     .child("chats")
                     .child(senderRoom)
@@ -103,7 +103,7 @@ public class MessagesAdapter extends RecyclerView.Adapter{
                     .child(receiverRoom)
                     .child("messages")
                     .child(message.getMessageId()).setValue(message);
-
+//
 
 
             return true; // true is closing popup, false is requesting a new selection
