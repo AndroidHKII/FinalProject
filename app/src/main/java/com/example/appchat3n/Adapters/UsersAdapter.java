@@ -14,8 +14,15 @@ import com.example.appchat3n.Activities.ChatActivity;
 import com.example.appchat3n.R;
 import com.example.appchat3n.Models.User;
 import com.example.appchat3n.databinding.RowConversationBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder>{
 
@@ -38,6 +45,34 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
     @Override
     public void onBindViewHolder(@NonNull UsersViewHolder holder, int position) {
         User user = users.get(position);
+
+        String senderId = FirebaseAuth.getInstance().getUid();
+
+        String senderRoom = senderId + user.getUid();
+
+        FirebaseDatabase.getInstance().getReference()
+                .child("chats")
+                .child(senderRoom)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()) {
+                            String lastMsg = snapshot.child("lastMsg").getValue(String.class);
+                            long time = snapshot.child("lastMsgTime").getValue(Long.class);
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+                            holder.binding.msgTime.setText(dateFormat.format(new Date(time)));
+                            holder.binding.lastMsg.setText(lastMsg);
+                        } else {
+                            holder.binding.lastMsg.setText("Tap to chat");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
 
         holder.binding.username.setText(user.getName());
 
