@@ -11,10 +11,8 @@
         android:theme="@style/Theme.AppChat3N"
         android:usesCleartextTraffic="true" >
         <activity
-            android:name=".Activities.SQLiteDB"
-            android:exported="false" />
-        <activity
             android:name=".Activities.ChatActivity"
+            android:theme="@style/Theme.AppChat3N.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".Activities.SetupProfileActivity"
