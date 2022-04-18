@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ import java.util.Map;
 public class ChatActivity extends AppCompatActivity {
 
     ActivityChatBinding binding;
+
     MessagesAdapter adapter;
     ArrayList<Message> messages;
 
@@ -61,6 +63,7 @@ public class ChatActivity extends AppCompatActivity {
     String senderUid;
     String receiverUid;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,10 +73,8 @@ public class ChatActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
 
-
         database = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
-
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading image...");
@@ -95,14 +96,13 @@ public class ChatActivity extends AppCompatActivity {
 
         binding.imageView2.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 finish();
             }
         });
 
         receiverUid = getIntent().getStringExtra("uid");
         senderUid = FirebaseAuth.getInstance().getUid();
-
 
         database.getReference().child("presence").child(receiverUid).addValueEventListener(new ValueEventListener() {
             @Override
@@ -129,12 +129,9 @@ public class ChatActivity extends AppCompatActivity {
         senderRoom = senderUid + receiverUid;
         receiverRoom = receiverUid + senderUid;
 
-
         adapter = new MessagesAdapter(this, messages, senderRoom, receiverRoom);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerView.setAdapter(adapter);
-
-
 
         database.getReference().child("chats")
                 .child(senderRoom)
@@ -160,7 +157,7 @@ public class ChatActivity extends AppCompatActivity {
 
         binding.sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 String messageTxt = binding.messageBox.getText().toString();
 
                 Date date = new Date();
@@ -193,20 +190,19 @@ public class ChatActivity extends AppCompatActivity {
                                 sendNotification(name, message.getMessage(), token);
                             }
                         });
-
-
                     }
                 });
+
             }
         });
 
         binding.attachment.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent,25);
+                startActivityForResult(intent, 25);
             }
         });
 
@@ -237,12 +233,13 @@ public class ChatActivity extends AppCompatActivity {
             };
         });
 
+
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
 //        getSupportActionBar().setTitle(name);
 //
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-
 
     void sendNotification(String name, String message, String token) {
         try {
@@ -345,8 +342,6 @@ public class ChatActivity extends AppCompatActivity {
 
                                                     }
                                                 });
-
-
                                             }
                                         });
 
@@ -373,6 +368,12 @@ public class ChatActivity extends AppCompatActivity {
         super.onPause();
         String currentId = FirebaseAuth.getInstance().getUid();
         database.getReference().child("presence").child(currentId).setValue("Offline");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chat_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

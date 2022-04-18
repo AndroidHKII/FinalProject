@@ -130,11 +130,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading Image...");
         dialog.setCancelable(false);
 
-        database = FirebaseDatabase.getInstance();
+
         users = new ArrayList<>();
         userStatuses = new ArrayList<>();
 
@@ -151,9 +152,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+
         usersAdapter = new UsersAdapter(this, users);
         statusAdapter = new TopStatusAdapter(this, userStatuses);
-      //  binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         binding.statusList.setLayoutManager(layoutManager);
@@ -170,8 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 users.clear();
                 for(DataSnapshot snapshot1 : snapshot.getChildren()) {
                     User user = snapshot1.getValue(User.class);
-
-                    if(!user.getUid().equals(FirebaseAuth.getInstance().getUid())) //xoá tự nhắn tin với chính mình
+                    if(!user.getUid().equals(FirebaseAuth.getInstance().getUid()))
                         users.add(user);
                 }
                 binding.recyclerView.hideShimmerAdapter();
@@ -216,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -230,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
     }
 
     @Override

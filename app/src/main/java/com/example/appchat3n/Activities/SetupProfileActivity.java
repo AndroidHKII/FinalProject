@@ -21,10 +21,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.Date;
+import java.util.HashMap;
+
 public class SetupProfileActivity extends AppCompatActivity {
 
     ActivitySetupProfileBinding binding;
-
     FirebaseAuth auth;
     FirebaseDatabase database;
     FirebaseStorage storage;
@@ -41,7 +43,6 @@ public class SetupProfileActivity extends AppCompatActivity {
         dialog.setMessage("Updating profile...");
         dialog.setCancelable(false);
 
-
         database = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
         auth = FirebaseAuth.getInstance();
@@ -50,7 +51,7 @@ public class SetupProfileActivity extends AppCompatActivity {
 
         binding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
@@ -60,7 +61,7 @@ public class SetupProfileActivity extends AppCompatActivity {
 
         binding.continueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 String name = binding.nameBox.getText().toString();
 
                 if(name.isEmpty()) {
@@ -69,7 +70,6 @@ public class SetupProfileActivity extends AppCompatActivity {
                 }
 
                 dialog.show();
-
                 if(selectedImage != null) {
                     StorageReference reference = storage.getReference().child("Profiles").child(auth.getUid());
                     reference.putFile(selectedImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -125,6 +125,7 @@ public class SetupProfileActivity extends AppCompatActivity {
                                 }
                             });
                 }
+
             }
         });
     }
@@ -135,6 +136,35 @@ public class SetupProfileActivity extends AppCompatActivity {
 
         if(data != null) {
             if(data.getData() != null) {
+                Uri uri = data.getData(); // filepath
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                long time = new Date().getTime();
+                StorageReference reference = storage.getReference().child("Profiles").child(time+"");
+                reference.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if(task.isSuccessful()) {
+                            reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String filePath = uri.toString();
+                                    HashMap<String, Object> obj = new HashMap<>();
+                                    obj.put("image", filePath);
+                                    database.getReference().child("users")
+                                            .child(FirebaseAuth.getInstance().getUid())
+                                            .updateChildren(obj).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+
+
                 binding.imageView.setImageURI(data.getData());
                 selectedImage = data.getData();
             }

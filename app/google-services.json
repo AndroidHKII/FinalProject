@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "332407985893",
+    "firebase_url": "https://appchat3n-6c71e-default-rtdb.firebaseio.com",
     "project_id": "appchat3n-6c71e",
     "storage_bucket": "appchat3n-6c71e.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "332407985893-j40b2qnfq3st8o94p2uhs5vjh8iafp15.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appchat3n",
+            "certificate_hash": "455baa058a7dabfaa33d23261a245803dd8681ed"
+          }
+        },
         {
           "client_id": "332407985893-4gg8511k0378t7sdmfabphu7mr5vsq5r.apps.googleusercontent.com",
           "client_type": 3

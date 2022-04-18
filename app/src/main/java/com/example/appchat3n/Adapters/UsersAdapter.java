@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder>{
+public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder> {
 
     Context context;
     ArrayList<User> users;
@@ -82,7 +82,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra("name", user.getName());
                 intent.putExtra("image", user.getProfileImage());
@@ -91,7 +91,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
                 context.startActivity(intent);
             }
         });
-
     }
 
     @Override
@@ -108,4 +107,5 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
             binding = RowConversationBinding.bind(itemView);
         }
     }
+
 }

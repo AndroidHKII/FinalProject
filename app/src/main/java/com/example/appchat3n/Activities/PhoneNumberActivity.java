@@ -14,6 +14,7 @@ public class PhoneNumberActivity extends AppCompatActivity {
     ActivityPhoneNumberBinding binding;
     FirebaseAuth auth;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,11 +35,12 @@ public class PhoneNumberActivity extends AppCompatActivity {
 
         binding.continueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 Intent intent = new Intent(PhoneNumberActivity.this, OTPActivity.class);
                 intent.putExtra("phoneNumber", binding.phoneBox.getText().toString());
                 startActivity(intent);
             }
         });
+
     }
 }
