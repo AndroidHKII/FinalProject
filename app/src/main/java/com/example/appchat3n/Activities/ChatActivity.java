@@ -147,6 +147,7 @@ public class ChatActivity extends AppCompatActivity {
                         }
 
                         adapter.notifyDataSetChanged();
+                        binding.recyclerView.scrollToPosition(messages.size()-1);
                     }
 
                     @Override
@@ -154,7 +155,6 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
-
         binding.sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,6 +170,7 @@ public class ChatActivity extends AppCompatActivity {
                 lastMsgObj.put("lastMsg", message.getMessage());
                 lastMsgObj.put("lastMsgTime", date.getTime());
 
+                //cap nhat lai tin nhan moi nhat
                 database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
                 database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
 

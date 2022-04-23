@@ -80,6 +80,7 @@ public class GroupChatActivity extends AppCompatActivity {
                         }
 
                         adapter.notifyDataSetChanged();
+                        binding.recyclerView.scrollToPosition(messages.size()-1);
                     }
 
                     @Override
