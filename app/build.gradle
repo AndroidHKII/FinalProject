@@ -58,8 +58,7 @@ dependencies {
     implementation 'com.github.sharish:ShimmerRecyclerView:v1.3'
 
     //smart reply
-    implementation 'com.google.firebase:firebase-ml-natural-language:22.0.1'
-    implementation 'com.google.firebase:firebase-ml-natural-language-smart-reply-model:20.0.8'
+    implementation 'com.google.mlkit:smart-reply:17.0.0'
 
 
     implementation 'com.android.volley:volley:1.2.1'
