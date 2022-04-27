@@ -29,3 +29,4 @@ Ngôn ngữ lập trình: Java
 - Circular Status View: https://github.com/3llomi/CircularStatusView
 - Shimmer RecyclerView: https://github.com/sharish/ShimmerRecyclerView
 - Unlimited Free Icons: https://www.flaticon.com/
+- Smart Reply: https://vncoder.vn/bai-viet/firebase-ml-kit-tra-loi-thong-minh-smart-reply-trong-android
