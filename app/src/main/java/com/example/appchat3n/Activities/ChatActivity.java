@@ -184,7 +184,9 @@ public class ChatActivity extends AppCompatActivity {
         receiverRoom = receiverUid + senderUid;
 
         adapter = new MessagesAdapter(this, messages, senderRoom, receiverRoom);
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(adapter);
 
         database.getReference().child("chats")
