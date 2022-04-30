@@ -45,7 +45,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
     @Override
     public void onBindViewHolder(@NonNull UsersViewHolder holder, int position) {
         User user = users.get(position);
-
         String senderId = FirebaseAuth.getInstance().getUid();
 
         String senderRoom = senderId + user.getUid();

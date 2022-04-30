@@ -2,6 +2,7 @@ package com.example.appchat3n.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.appchat3n.Adapters.TopStatusAdapter;
+import com.example.appchat3n.Dtos.ChatModel;
 import com.example.appchat3n.Models.Status;
 import com.example.appchat3n.Models.UserStatus;
 import com.example.appchat3n.R;
@@ -46,10 +49,16 @@ import com.google.firebase.storage.UploadTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 public class MainActivity extends AppCompatActivity {
+
+    CountDownLatch countDownListUser = new CountDownLatch(1);
 
     ActivityMainBinding binding;
     FirebaseDatabase database;
@@ -61,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     User user;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
                         users.add(user);
                 }
                 binding.recyclerView.hideShimmerAdapter();
+                //sortUsersForLastMessageTime(users);
+                sortUsers();
                 usersAdapter.notifyDataSetChanged();
             }
 
@@ -232,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
+        //users.get(users.size()-1);
     }
 
     @Override
@@ -321,5 +333,77 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.topmenu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+    private void sortUsers()
+    {
+        database.getReference().child("chats").addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(users.size()>0) {
+                    List<SenderUser> senderUsers = new ArrayList<>();
+                    for(int i=0,end=users.size();i<end;i++)
+                    {
+                        senderUsers.add(new SenderUser(users.get(i),Long.MAX_VALUE));
+                    }
+                    for (DataSnapshot snapshotTemp : snapshot.getChildren()) {
+                        if (snapshotTemp.getKey().startsWith(FirebaseAuth.getInstance().getUid())) {
+                            ChatModel temp = snapshotTemp.getValue(ChatModel.class);
+                            Optional<User> tempUser = users.stream().filter(e -> snapshotTemp.getKey().endsWith(e.getUid())).findFirst();
+                            if (tempUser.isPresent()) {
+                                senderUsers.remove(senderUsers.stream().filter(e->e.user.getUid().equals(tempUser.get().getUid())).findFirst().get());
+                                senderUsers.add(new SenderUser(tempUser.get(), temp.getLastMsgTime()));
+                            }
+                            else ;       //no action
+
+                        }
+                    }
+                    senderUsers.sort(Comparator.comparingLong(MainActivity.SenderUser::getLastMessageTime).reversed());
+                    users= new ArrayList<>();
+                    for (int i=0,end=senderUsers.size();i<end;i++)
+                    {
+                        users.add(senderUsers.get(i).getUser());
+                    }
+                    binding.recyclerView.hideShimmerAdapter();
+                    usersAdapter= new UsersAdapter(MainActivity.this,users);
+                    binding.recyclerView.setAdapter(usersAdapter);
+                    //binding.recyclerView.showShimmerAdapter();
+
+                }
+                else; //no action
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+    private class SenderUser{
+        User user;
+        long lastMessageTime;
+
+
+        public SenderUser(User user, long lastMessageTime) {
+            this.user = user;
+            this.lastMessageTime = lastMessageTime;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+        public void setUser(User user) {
+            this.user = user;
+        }
+
+        public long getLastMessageTime() {
+            return lastMessageTime;
+        }
+
+        public void setLastMessageTime(long lastMessageTime) {
+            this.lastMessageTime = lastMessageTime;
+        }
     }
 }
