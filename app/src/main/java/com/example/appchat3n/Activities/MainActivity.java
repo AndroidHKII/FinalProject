@@ -24,6 +24,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.appchat3n.Adapters.TopStatusAdapter;
 import com.example.appchat3n.Dtos.ChatModel;
+import com.example.appchat3n.Dtos.SenderUser;
 import com.example.appchat3n.Models.Status;
 import com.example.appchat3n.Models.UserStatus;
 import com.example.appchat3n.R;
@@ -351,14 +352,14 @@ public class MainActivity extends AppCompatActivity {
                             ChatModel temp = snapshotTemp.getValue(ChatModel.class);
                             Optional<User> tempUser = users.stream().filter(e -> snapshotTemp.getKey().endsWith(e.getUid())).findFirst();
                             if (tempUser.isPresent()) {
-                                senderUsers.remove(senderUsers.stream().filter(e->e.user.getUid().equals(tempUser.get().getUid())).findFirst().get());
+                                senderUsers.remove(senderUsers.stream().filter(e->e.getUser().getUid().equals(tempUser.get().getUid())).findFirst().get());
                                 senderUsers.add(new SenderUser(tempUser.get(), temp.getLastMsgTime()));
                             }
                             else ;       //no action
 
                         }
                     }
-                    senderUsers.sort(Comparator.comparingLong(MainActivity.SenderUser::getLastMessageTime).reversed());
+                    senderUsers.sort(Comparator.comparingLong(SenderUser::getLastMessageTime).reversed());
                     users= new ArrayList<>();
                     for (int i=0,end=senderUsers.size();i<end;i++)
                     {
@@ -379,31 +380,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
-    private class SenderUser{
-        User user;
-        long lastMessageTime;
-
-
-        public SenderUser(User user, long lastMessageTime) {
-            this.user = user;
-            this.lastMessageTime = lastMessageTime;
-        }
-
-        public User getUser() {
-            return user;
-        }
-
-        public void setUser(User user) {
-            this.user = user;
-        }
-
-        public long getLastMessageTime() {
-            return lastMessageTime;
-        }
-
-        public void setLastMessageTime(long lastMessageTime) {
-            this.lastMessageTime = lastMessageTime;
-        }
     }
 }
