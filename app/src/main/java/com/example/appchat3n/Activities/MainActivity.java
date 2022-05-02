@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.appchat3n.Adapters.TopStatusAdapter;
+import com.example.appchat3n.Constant.KeyIntentConstant;
 import com.example.appchat3n.Dtos.ChatModel;
 import com.example.appchat3n.Dtos.SenderUser;
 import com.example.appchat3n.Models.Status;
@@ -321,7 +322,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, GroupChatActivity.class));
                 break;
             case R.id.search:
-                Toast.makeText(this, "Search clicked.", Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(MainActivity.this,FriendActivity.class);
+                intent.putExtra(KeyIntentConstant.keyListUser,users);
+                startActivity(intent);
+                Toast.makeText(this, "Add friend clicked.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
                 Toast.makeText(this, "Settings Clicked.", Toast.LENGTH_SHORT).show();

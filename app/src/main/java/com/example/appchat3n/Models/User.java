@@ -1,6 +1,8 @@
 package com.example.appchat3n.Models;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private String uid, name, phoneNumber, profileImage, token;
 
