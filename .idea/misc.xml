@@ -13,7 +13,8 @@
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout-xlarge/item_receive_group.xml" value="0.125" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout-xlarge/item_sent_group.xml" value="0.125" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout-xlarge/item_status.xml" value="0.125" />
-        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_chat.xml" value="0.2" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_chat.xml" value="0.264" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_friend.xml" value="0.25" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_group_chat.xml" value="0.20521590423257802" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_main.xml" value="0.264" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_otpactivity.xml" value="0.10989583333333333" />
@@ -49,7 +50,6 @@
         <entry key="..\:/Nam 3/HK2/lap trinh di dong/De tai cuoi ki/Source code/FinalProject/app/src/main/res/layout/item_sent.xml" value="0.36666666666666664" />
         <entry key="..\:/Nam 3/HK2/lap trinh di dong/De tai cuoi ki/Source code/FinalProject/app/src/main/res/layout/item_status.xml" value="0.36666666666666664" />
         <entry key="..\:/Nam 3/HK2/lap trinh di dong/De tai cuoi ki/Source code/FinalProject/app/src/main/res/layout/row_conversation.xml" value="0.36666666666666664" />
-        <entry key="..\:/Nam 3/HK2/lap trinh di dong/De tai cuoi ki/Source code/FinalProject/app/src/main/res/menu/search_menu.xml" value="0.33" />
         <entry key="..\:/Nam 3/HK2/lap trinh di dong/De tai cuoi ki/Source code/FinalProject/app/src/main/res/menu/topmenu.xml" value="0.36666666666666664" />
         <entry key="..\:/Nam 3/HK2/lap trinh di dong/Do an cuoi ki/FinalProject/app/src/main/res/layout/activity_chat.xml" value="0.264" />
         <entry key="..\:/Nam 3/HK2/lap trinh di dong/Do an cuoi ki/FinalProject/app/src/main/res/layout/activity_group_chat.xml" value="0.1" />
