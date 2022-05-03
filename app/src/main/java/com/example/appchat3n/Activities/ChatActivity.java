@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,6 +54,7 @@ import com.google.mlkit.nl.smartreply.TextMessage;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -62,6 +64,8 @@ import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
+    private static final int REQUEST_GET_CONTENT = 25;
+    private static final int REQUEST_IMAGE_CAPTURE = 26;
     ActivityChatBinding binding;
 
     MessagesAdapter adapter;
@@ -263,19 +267,19 @@ public class ChatActivity extends AppCompatActivity {
 
         binding.attachment.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent, 25);
+                startActivityForResult(intent, REQUEST_GET_CONTENT);
             }
         });
 
         binding.camera.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, 0);
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
             }
         });
 
@@ -364,9 +368,9 @@ public class ChatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == 25) {
-            if(data != null) {
-                if(data.getData() != null) {
+        if (requestCode == REQUEST_GET_CONTENT) {
+            if (data != null) {
+                if (data.getData() != null) {
                     Uri selectedImage = data.getData();
                     Calendar calendar = Calendar.getInstance();
                     StorageReference reference = storage.getReference().child("chats").child(calendar.getTimeInMillis() + "");
@@ -375,7 +379,7 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                             dialog.dismiss();
-                            if(task.isSuccessful()) {
+                            if (task.isSuccessful()) {
                                 reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
@@ -404,21 +408,19 @@ public class ChatActivity extends AppCompatActivity {
                                                 .child(randomKey)
                                                 .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
-                                            public void onSuccess(Void aVoid) {
+                                            public void onSuccess(Void unused) {
                                                 database.getReference().child("chats")
                                                         .child(receiverRoom)
                                                         .child("messages")
                                                         .child(randomKey)
                                                         .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
-                                                    public void onSuccess(Void aVoid) {
+                                                    public void onSuccess(Void unused) {
 
                                                     }
                                                 });
                                             }
                                         });
-
-                                        //Toast.makeText(ChatActivity.this, filePath, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
@@ -426,9 +428,71 @@ public class ChatActivity extends AppCompatActivity {
                     });
                 }
             }
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (data != null) {
+                Bitmap bmp = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                bmp.recycle();
+
+                Calendar calendar = Calendar.getInstance();
+                StorageReference reference = storage.getReference().child("chats").child(calendar.getTimeInMillis() + "");
+                dialog.show();
+                reference.putBytes(byteArray).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        dialog.dismiss();
+                        if (task.isSuccessful()) {
+                            reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String filePath = uri.toString();
+
+                                    String messageTxt = binding.messageBox.getText().toString();
+
+                                    Date date = new Date();
+                                    Message message = new Message(messageTxt, senderUid, date.getTime());
+                                    message.setMessage("photo");
+                                    message.setImageUrl(filePath);
+                                    binding.messageBox.setText("");
+
+                                    String randomKey = database.getReference().push().getKey();
+
+                                    HashMap<String, Object> lastMsgObj = new HashMap<>();
+                                    lastMsgObj.put("lastMsg", message.getMessage());
+                                    lastMsgObj.put("lastMsgTime", date.getTime());
+
+                                    database.getReference().child("chats").child(senderRoom).updateChildren(lastMsgObj);
+                                    database.getReference().child("chats").child(receiverRoom).updateChildren(lastMsgObj);
+
+                                    database.getReference().child("chats")
+                                            .child(senderRoom)
+                                            .child("messages")
+                                            .child(randomKey)
+                                            .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            database.getReference().child("chats")
+                                                    .child(receiverRoom)
+                                                    .child("messages")
+                                                    .child(randomKey)
+                                                    .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+            }
         }
     }
-
     @Override
     protected void onResume() {
         super.onResume();
