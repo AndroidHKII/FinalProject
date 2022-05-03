@@ -1,7 +1,7 @@
 package com.example.appchat3n.Adapters;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.appchat3n.Enums.FriendState;
-import com.example.appchat3n.Models.Friend;
 import com.example.appchat3n.Models.User;
 import com.example.appchat3n.R;
 import com.example.appchat3n.databinding.ItemFriendBinding;
@@ -30,7 +29,6 @@ import android.widget.Filterable;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Objects;
 
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendViewHolder> implements Filterable {
@@ -58,6 +56,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
 
         if(Objects.isNull(friend))
             return;
+        //Disable deny button
+        holder.binding.deny.setVisibility(View.GONE);
         //Get FriendState
         FirebaseDatabase.getInstance().getReference()
                 .child("friends")
@@ -69,59 +69,64 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                         if(snapshot.exists())
                         {
                             //Lưu ý: Hàm onComplete bị ghi đè sau khi thực hiện xong event, nên ta đổi ngược lại các thông báo(Toast) trong hàm onComplete
-                            String friendState = snapshot.child("friendState").getValue(String.class);
+                            String friendState = snapshot.getValue(String.class);
                             if(friendState.equals(FriendState.FRIEND.name())) {
-                                holder.binding.addRemove.setText("Remove");
+                                holder.binding.addRemove.setText("Unfriend");
                                 holder.binding.addRemove.setBackgroundColor(context.getResources().getColor(R.color.semiRed));
                                 holder.binding.addRemove.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            Friend newFriend= new Friend(friend,FriendState.NOT_FRIEND);
-                                            FirebaseDatabase.getInstance().getReference()
-                                                    .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).setValue(newFriend, new DatabaseReference.CompletionListener() {
-                                                @Override
-                                                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                                                    Toast.makeText(context, "Remove "+friend.getName()+" successfully!", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
+                                            removeFriend(friend);
                                         }
-                                    }
-                                );
-                            }
-                            else
-                            {
-                                holder.binding.addRemove.setText("Add");
-                                holder.binding.addRemove.setBackgroundColor(context.getResources().getColor(R.color.green));
-                                holder.binding.addRemove.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            Friend newFriend= new Friend(friend,FriendState.FRIEND);
-                                            FirebaseDatabase.getInstance().getReference()
-                                                    .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).setValue(newFriend, new DatabaseReference.CompletionListener() {
-                                                @Override
-                                                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                                                    Toast.makeText(context, "Add "+friend.getName()+" to friend successfully!", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        }
-                                    }
-                                );
 
+                                    }
+                                );
                             }
-                        } else {
-                            holder.binding.addRemove.setText("Add");
+                            else        //friendState='WAIT'
+                            {
+                                if(friendState.equals(FriendState.WAIT.name())) {
+                                    holder.binding.addRemove.setText("CANCEL");
+                                    holder.binding.addRemove.setBackgroundColor(context.getResources().getColor(R.color.brown));
+                                    holder.binding.addRemove.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                removeRequestFriend(friend,FriendState.WAIT);
+                                            }
+                                        }
+                                    );
+                                }
+                                else    //friendState==Request
+                                {
+                                    holder.binding.addRemove.setText("ACCEPT");
+                                    holder.binding.addRemove.setBackgroundColor(context.getResources().getColor(R.color.teal_200));
+                                    holder.binding.addRemove.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                addFriend(friend);
+                                            }
+                                        }
+                                    );
+                                    //Set up deny button
+                                    holder.binding.deny.setVisibility(View.VISIBLE);
+                                    holder.binding.deny.setText("DENY");
+                                    holder.binding.deny.setBackgroundColor(context.getResources().getColor(R.color.red));
+                                    holder.binding.deny.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                removeRequestFriend(friend,FriendState.REQUEST);
+                                            }
+                                        }
+                                    );
+                                }
+                            }
+                        }
+                        else {
+                            holder.binding.addRemove.setText("ADD");
                             holder.binding.addRemove.setBackgroundColor(context.getResources().getColor(R.color.green));
                             holder.binding.addRemove.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        Friend newFriend= new Friend(friend,FriendState.FRIEND);
-                                        FirebaseDatabase.getInstance().getReference()
-                                                .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).setValue(newFriend, new DatabaseReference.CompletionListener() {
-                                            @Override
-                                            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                                                Toast.makeText(context, "Add "+friend.getName()+" to friend successfully!", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
+                                        requestFriend(friend);
                                     }
                                 }
                             );
@@ -142,7 +147,144 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
         holder.binding.username.setText(friend.getName());
         holder.binding.phone.setText(friend.getPhoneNumber());
     }
-
+    public void requestFriend(User friend)
+    {
+        FirebaseDatabase.getInstance().getReference()
+                .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).setValue(FriendState.WAIT.name(), new DatabaseReference.CompletionListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if(Objects.isNull(error)) {
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).setValue(FriendState.REQUEST.name(), new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                            if(Objects.isNull(error))
+                                Toast.makeText(context, "Send friend request to " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
+                            else {
+                                Log.e("Request friend error: ",error.getMessage());
+                                Log.e("Restore: ","Remove request friend from current User");
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).removeValue();
+                                Toast.makeText(context, "Send friend request to " + friend.getName() + " unsuccessfully!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    Log.e("Request friend error: ",error.getMessage());
+                    Toast.makeText(context, "Send friend request to " + friend.getName() + " unsuccessfully!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+    public void removeRequestFriend(User friend, FriendState originState)
+    {
+        FirebaseDatabase.getInstance().getReference()
+                .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).removeValue(new DatabaseReference.CompletionListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if(Objects.isNull(error)) {
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).removeValue( new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                            if(Objects.isNull(error)) {
+                                if (originState == FriendState.WAIT)
+                                    Toast.makeText(context, "Remove friend request from " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
+                                else
+                                    Toast.makeText(context, "Deny friend request of " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
+                            }
+                            else {
+                                Log.e("Remove friend req err: ",error.getMessage());
+                                Log.e("Restore: ","Add removing friend request to current User");
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).setValue(originState.name());
+                                if(originState==FriendState.WAIT)
+                                    Toast.makeText(context, "Remove friend request from " + friend.getName() + " unsuccessfully!", Toast.LENGTH_LONG).show();
+                                else
+                                    Toast.makeText(context, "Deny friend request of " + friend.getName() + " unsuccessfully!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    Log.e("Remove friend req err: ",error.getMessage());
+                    if(originState==FriendState.WAIT)
+                        Toast.makeText(context, "Remove friend request from " + friend.getName() + " unsuccessfully!", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(context, "Deny friend request of " + friend.getName() + " unsuccessfully!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+    public void addFriend(User friend)
+    {
+        FirebaseDatabase.getInstance().getReference()
+                .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).setValue(FriendState.FRIEND.name(), new DatabaseReference.CompletionListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if(Objects.isNull(error)) {
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).setValue(FriendState.FRIEND.name(), new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                            if(Objects.isNull(error))
+                                Toast.makeText(context, "Add " + friend.getName() + " to friend successfully!", Toast.LENGTH_LONG).show();
+                            else {
+                                Log.e("Add friend error: ",error.getMessage());
+                                Log.e("Restore: ","Remove adding friend from current User");
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).removeValue();
+                                Toast.makeText(context, "Add " + friend.getName() + " to friend unsuccessfully!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    Log.e("Add friend error: ",error.getMessage());
+                    Toast.makeText(context, "Add " + friend.getName() + " to friend unsuccessfully!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+    public void removeFriend(User friend)
+    {
+        FirebaseDatabase.getInstance().getReference()
+                .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).removeValue(new DatabaseReference.CompletionListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if(Objects.isNull(error)) {
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).removeValue( new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                            if(Objects.isNull(error))
+                                Toast.makeText(context, "Unfriend " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
+                            else {
+                                Log.e("Unfriend friend error: ",error.getMessage());
+                                Log.e("Restore: ","Add removing friend to current User");
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).setValue(FriendState.FRIEND.name());
+                                Toast.makeText(context, "Unfriend " + friend.getName() + " unsuccessfully!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    Log.e("Remove friend error: ",error.getMessage());
+                    Toast.makeText(context, "Unfriend " + friend.getName() + " unsuccessfully!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public int getItemCount() {
@@ -151,7 +293,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
         return 0;
     }
 
-    public class FriendViewHolder extends RecyclerView.ViewHolder
+    class FriendViewHolder extends RecyclerView.ViewHolder
     {
         ItemFriendBinding binding;
         public FriendViewHolder(@NonNull View itemView) {

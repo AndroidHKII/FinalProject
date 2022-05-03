@@ -78,6 +78,9 @@ public class FriendActivity extends AppCompatActivity {
             searchView.setIconified(true);
             return;
         }
+        if(searchView.isIconified()) {
+            startActivity(new Intent(FriendActivity.this,MainActivity.class));
+        }
         super.onBackPressed();
     }
 }
