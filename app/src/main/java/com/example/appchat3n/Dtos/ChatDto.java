@@ -1,13 +1,13 @@
 package com.example.appchat3n.Dtos;
 
 
-public class ChatModel {
+public class ChatDto {
     private String chatID;
     private long lastMsgTime;
-    public ChatModel() {
+    public ChatDto() {
     }
 
-    public ChatModel(String chatID,long lastMsgTime) {
+    public ChatDto(String chatID, long lastMsgTime) {
         this.chatID = chatID;
         this.lastMsgTime = lastMsgTime;
     }

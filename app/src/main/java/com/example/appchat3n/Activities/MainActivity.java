@@ -24,8 +24,9 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.appchat3n.Adapters.TopStatusAdapter;
 import com.example.appchat3n.Constant.KeyIntentConstant;
-import com.example.appchat3n.Dtos.ChatModel;
-import com.example.appchat3n.Dtos.SenderUser;
+import com.example.appchat3n.Dtos.ChatDto;
+import com.example.appchat3n.Dtos.SenderUserDto;
+import com.example.appchat3n.Enums.FriendState;
 import com.example.appchat3n.Models.Status;
 import com.example.appchat3n.Models.UserStatus;
 import com.example.appchat3n.R;
@@ -64,10 +65,14 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     FirebaseDatabase database;
-    ArrayList<User> users;
     UsersAdapter usersAdapter;
     TopStatusAdapter statusAdapter;
+
+    ArrayList<User> users;
+
+    ArrayList<User> listFriends;
     ArrayList<UserStatus> userStatuses;
+
     ProgressDialog dialog;
 
     User user;
@@ -149,7 +154,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         users = new ArrayList<>();
+
         userStatuses = new ArrayList<>();
+        listFriends=new ArrayList<>();
 
         database.getReference().child("users").child(FirebaseAuth.getInstance().getUid())
                 .addValueEventListener(new ValueEventListener() {
@@ -165,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
-        usersAdapter = new UsersAdapter(this, users);
+        usersAdapter = new UsersAdapter(this, listFriends);
         statusAdapter = new TopStatusAdapter(this, userStatuses);
 //        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -188,8 +195,9 @@ public class MainActivity extends AppCompatActivity {
                         users.add(user);
                 }
                 binding.recyclerView.hideShimmerAdapter();
-                sortUsers();
+                filterFriend();
                 usersAdapter.notifyDataSetChanged();
+                statusAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -198,37 +206,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        database.getReference().child("stories").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    userStatuses.clear();
-                    for(DataSnapshot storySnapshot : snapshot.getChildren()) {
-                        UserStatus status = new UserStatus();
-                        status.setName(storySnapshot.child("name").getValue(String.class));
-                        status.setProfileImage(storySnapshot.child("profileImage").getValue(String.class));
-                        status.setLastUpdated(storySnapshot.child("lastUpdated").getValue(Long.class));
-
-                        ArrayList<Status> statuses = new ArrayList<>();
-
-                        for(DataSnapshot statusSnapshot : storySnapshot.child("statuses").getChildren()) {
-                            Status sampleStatus = statusSnapshot.getValue(Status.class);
-                            statuses.add(sampleStatus);
-                        }
-
-                        status.setStatuses(statuses);
-                        userStatuses.add(status);
-                    }
-                    binding.statusList.hideShimmerAdapter();
-                    statusAdapter.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
 
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -338,41 +315,105 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.topmenu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+    private void filterFriend()
+    {
+        database.getReference().child("friends").child(FirebaseAuth.getInstance().getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(users.size()>0)
+                {
+                    ArrayList<String> listIdFriend=new ArrayList<>();
+                    for (DataSnapshot snapshotTemp : snapshot.getChildren()) {
+                        if (snapshotTemp.getValue().equals(FriendState.FRIEND.name())) {
+                            listIdFriend.add(snapshotTemp.getKey());
+                        }
+                    }
+                    for(int i=0,end=users.size();i<end;i++)
+                    {
+                        if(listIdFriend.contains(users.get(i).getUid()))
+                            listFriends.add(users.get(i));
+                    }
+                    showStoriesOfFriend(listIdFriend);
+                    sortUsers();
+                }
+                else;       //no action
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+    private void showStoriesOfFriend(ArrayList<String> listIDFriend)
+    {
+        database.getReference().child("stories").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()) {
+                    userStatuses.clear();
+
+                    for(DataSnapshot storySnapshot : snapshot.getChildren()) {
+                        if(listIDFriend.contains(storySnapshot.getKey())) {
+                            UserStatus status = new UserStatus();
+                            status.setName(storySnapshot.child("name").getValue(String.class));
+                            status.setProfileImage(storySnapshot.child("profileImage").getValue(String.class));
+                            status.setLastUpdated(storySnapshot.child("lastUpdated").getValue(Long.class));
+
+                            ArrayList<Status> statuses = new ArrayList<>();
+
+                            for (DataSnapshot statusSnapshot : storySnapshot.child("statuses").getChildren()) {
+                                Status sampleStatus = statusSnapshot.getValue(Status.class);
+                                statuses.add(sampleStatus);
+                            }
+
+                            status.setStatuses(statuses);
+                            userStatuses.add(status);
+                        }
+                    }
+                    binding.statusList.hideShimmerAdapter();
+                    statusAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
     private void sortUsers()
     {
         database.getReference().child("chats").addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(users.size()>0) {
-                    List<SenderUser> senderUsers = new ArrayList<>();
-                    for(int i=0,end=users.size();i<end;i++)
+                if(listFriends.size()>0) {
+                    List<SenderUserDto> senderUsers = new ArrayList<>();
+                    for(int i=0,end=listFriends.size();i<end;i++)
                     {
-                        senderUsers.add(new SenderUser(users.get(i),Long.MAX_VALUE));
+                        senderUsers.add(new SenderUserDto(listFriends.get(i),Long.MAX_VALUE));
                     }
                     for (DataSnapshot snapshotTemp : snapshot.getChildren()) {
                         if (snapshotTemp.getKey().startsWith(FirebaseAuth.getInstance().getUid())) {
-                            ChatModel temp = snapshotTemp.getValue(ChatModel.class);
-                            Optional<User> tempUser = users.stream().filter(e -> snapshotTemp.getKey().endsWith(e.getUid())).findFirst();
+                            ChatDto temp = snapshotTemp.getValue(ChatDto.class);
+                            Optional<User> tempUser = listFriends.stream().filter(e -> snapshotTemp.getKey().endsWith(e.getUid())).findFirst();
                             if (tempUser.isPresent()) {
                                 senderUsers.remove(senderUsers.stream().filter(e->e.getUser().getUid().equals(tempUser.get().getUid())).findFirst().get());
-                                senderUsers.add(new SenderUser(tempUser.get(), temp.getLastMsgTime()));
+                                senderUsers.add(new SenderUserDto(tempUser.get(), temp.getLastMsgTime()));
                             }
                             else ;       //no action
 
                         }
                     }
-                    senderUsers.sort(Comparator.comparingLong(SenderUser::getLastMessageTime).reversed());
-                    users= new ArrayList<>();
+                    senderUsers.sort(Comparator.comparingLong(SenderUserDto::getLastMessageTime).reversed());
+                    listFriends.clear();
                     for (int i=0,end=senderUsers.size();i<end;i++)
                     {
-                        users.add(senderUsers.get(i).getUser());
+                        listFriends.add(senderUsers.get(i).getUser());
                     }
                     binding.recyclerView.hideShimmerAdapter();
-                    usersAdapter= new UsersAdapter(MainActivity.this,users);
-                    binding.recyclerView.setAdapter(usersAdapter);
                     usersAdapter.notifyDataSetChanged();
-                    //binding.recyclerView.showShimmerAdapter();
 
                 }
                 else; //no action

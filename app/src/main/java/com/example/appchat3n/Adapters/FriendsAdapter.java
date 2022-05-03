@@ -35,6 +35,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
     Context context;
     ArrayList<User> friends;
     ArrayList<User> listFriendOrigin;
+    User myUser;
 
     public FriendsAdapter(Context context, ArrayList<User> friends) {
         this.context = context;
@@ -56,8 +57,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
 
         if(Objects.isNull(friend))
             return;
-        //Disable deny button
-        holder.binding.deny.setVisibility(View.GONE);
         //Get FriendState
         FirebaseDatabase.getInstance().getReference()
                 .child("friends")
@@ -66,6 +65,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        //Disable deny button
+                        holder.binding.deny.setVisibility(View.GONE);
                         if(snapshot.exists())
                         {
                             //Lưu ý: Hàm onComplete bị ghi đè sau khi thực hiện xong event, nên ta đổi ngược lại các thông báo(Toast) trong hàm onComplete
@@ -224,7 +225,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
     public void addFriend(User friend)
     {
         FirebaseDatabase.getInstance().getReference()
-                .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).setValue(FriendState.FRIEND.name(), new DatabaseReference.CompletionListener() {
+                .child("friends").child(FirebaseAuth.getInstance().getUid()).child(friend.getUid()).setValue(FriendState.FRIEND, new DatabaseReference.CompletionListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
