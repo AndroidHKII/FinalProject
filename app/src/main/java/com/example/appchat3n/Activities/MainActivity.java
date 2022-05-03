@@ -320,8 +320,10 @@ public class MainActivity extends AppCompatActivity {
         database.getReference().child("friends").child(FirebaseAuth.getInstance().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 if(users.size()>0)
                 {
+                    listFriends.clear();
                     ArrayList<String> listIdFriend=new ArrayList<>();
                     for (DataSnapshot snapshotTemp : snapshot.getChildren()) {
                         if (snapshotTemp.getValue().equals(FriendState.FRIEND.name())) {
