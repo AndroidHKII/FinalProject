@@ -25,18 +25,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import android.content.Context;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
-public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendViewHolder> {
+public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendViewHolder> implements Filterable {
     Context context;
     ArrayList<User> friends;
+    ArrayList<User> listFriendOrigin;
 
     public FriendsAdapter(Context context, ArrayList<User> friends) {
         this.context = context;
         this.friends = friends;
+        this.listFriendOrigin=friends;
     }
 
     @NonNull
@@ -153,6 +158,38 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
             super(itemView);
             binding= ItemFriendBinding.bind(itemView);
         }
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String stringSearch=charSequence.toString();
+                if(stringSearch.isEmpty()) {
+                    friends = listFriendOrigin;
+                }
+                else
+                {
+                    ArrayList<User> searchFriends=new ArrayList<>();
+                    for(User user: listFriendOrigin)
+                    {
+                        if(user.getName().toLowerCase().contains(stringSearch)||user.getPhoneNumber().contains(stringSearch))
+                            searchFriends.add(user);
+                    }
+                    friends=searchFriends;
+                }
+                FilterResults filterResults=new FilterResults();
+                filterResults.values=friends;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                friends= (ArrayList<User>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
 }

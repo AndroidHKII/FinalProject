@@ -188,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
                         users.add(user);
                 }
                 binding.recyclerView.hideShimmerAdapter();
-                //sortUsersForLastMessageTime(users);
                 sortUsers();
                 usersAdapter.notifyDataSetChanged();
             }
@@ -321,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.group:
                 startActivity(new Intent(MainActivity.this, GroupChatActivity.class));
                 break;
-            case R.id.search:
+            case R.id.addfriend:
                 Intent intent=new Intent(MainActivity.this,FriendActivity.class);
                 intent.putExtra(KeyIntentConstant.keyListUser,users);
                 startActivity(intent);
@@ -372,6 +371,7 @@ public class MainActivity extends AppCompatActivity {
                     binding.recyclerView.hideShimmerAdapter();
                     usersAdapter= new UsersAdapter(MainActivity.this,users);
                     binding.recyclerView.setAdapter(usersAdapter);
+                    usersAdapter.notifyDataSetChanged();
                     //binding.recyclerView.showShimmerAdapter();
 
                 }
