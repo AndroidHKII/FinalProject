@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -198,6 +199,7 @@ public class ChatActivity extends AppCompatActivity {
                 .child(senderRoom)
                 .child("messages")
                 .addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("NotifyDataSetChanged")
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         messages.clear();
@@ -206,7 +208,7 @@ public class ChatActivity extends AppCompatActivity {
                             message.setMessageId(snapshot1.getKey());
                             messages.add(message);
                         }
-
+                        adapter = new MessagesAdapter(ChatActivity.this, messages, senderRoom, receiverRoom);
                         adapter.notifyDataSetChanged();
 
                         binding.recyclerView.scrollToPosition(messages.size()-1);
@@ -432,10 +434,9 @@ public class ChatActivity extends AppCompatActivity {
             if (data != null) {
                 Bitmap bmp = (Bitmap) data.getExtras().get("data");
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
                 bmp.recycle();
-
                 Calendar calendar = Calendar.getInstance();
                 StorageReference reference = storage.getReference().child("chats").child(calendar.getTimeInMillis() + "");
                 dialog.show();
