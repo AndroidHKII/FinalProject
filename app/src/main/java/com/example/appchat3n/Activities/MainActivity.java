@@ -146,8 +146,6 @@ public class MainActivity extends AppCompatActivity {
                         //Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
                     }
                 });
-
-
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading Image...");
         dialog.setCancelable(false);
@@ -301,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.addfriend:
                 Intent intent=new Intent(MainActivity.this,FriendActivity.class);
                 intent.putExtra(KeyIntentConstant.keyListUser,users);
+                intent.putExtra(KeyIntentConstant.keyMyUser,user);
                 startActivity(intent);
                 Toast.makeText(this, "Add friend clicked.", Toast.LENGTH_SHORT).show();
                 break;

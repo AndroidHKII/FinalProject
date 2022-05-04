@@ -34,9 +34,9 @@ public class FriendActivity extends AppCompatActivity {
         //Get list users from intent
         Intent intent=getIntent();
         users=(ArrayList<User>) intent.getSerializableExtra(KeyIntentConstant.keyListUser);
-
+        User currentUser= (User) intent.getSerializableExtra(KeyIntentConstant.keyMyUser);
         //Initial adapter and set adapter
-        friendsAdapter=new FriendsAdapter(this,users);
+        friendsAdapter=new FriendsAdapter(this,users,currentUser);
         binding.recyclerViewFriends.setAdapter(friendsAdapter);
 
         //Add bottom decider

@@ -46,11 +46,13 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
     Context context;
     ArrayList<User> friends;
     ArrayList<User> listFriendOrigin;
+    User currentUser;
 
-    public FriendsAdapter(Context context, ArrayList<User> friends) {
+    public FriendsAdapter(Context context, ArrayList<User> friends, User currentUser) {
         this.context = context;
         this.friends = friends;
         this.listFriendOrigin=friends;
+        this.currentUser=currentUser;
     }
 
     @NonNull
@@ -170,8 +172,10 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                             .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).setValue(FriendState.REQUEST.name(), new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                            if(Objects.isNull(error))
+                            if(Objects.isNull(error)) {
+                                sendNotification(currentUser.getName(), "send you a friend request !", friend.getToken());
                                 Toast.makeText(context, "Send friend request to " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
+                            }
                             else {
                                 Log.e("Request friend error: ",error.getMessage());
                                 Log.e("Restore: ","Remove request friend from current User");
@@ -205,8 +209,10 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                             if(Objects.isNull(error)) {
                                 if (originState == FriendState.WAIT)
                                     Toast.makeText(context, "Remove friend request from " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
-                                else
+                                else {
+                                    sendNotification(currentUser.getName(),"deny your friend request!",friend.getToken());
                                     Toast.makeText(context, "Deny friend request of " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
+                                }
                             }
                             else {
                                 Log.e("Remove friend req err: ",error.getMessage());
@@ -244,8 +250,10 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                             .child("friends").child(friend.getUid()).child(FirebaseAuth.getInstance().getUid()).setValue(FriendState.FRIEND.name(), new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                            if(Objects.isNull(error))
+                            if(Objects.isNull(error)) {
+                                sendNotification(currentUser.getName(),"accept your friend request",friend.getToken());
                                 Toast.makeText(context, "Add " + friend.getName() + " to friend successfully!", Toast.LENGTH_LONG).show();
+                            }
                             else {
                                 Log.e("Add friend error: ",error.getMessage());
                                 Log.e("Restore: ","Remove adding friend from current User");
@@ -277,6 +285,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                         @Override
                         public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                             if(Objects.isNull(error))
+                                //don't send notification in this case
                                 Toast.makeText(context, "Unfriend " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
                             else {
                                 Log.e("Unfriend friend error: ",error.getMessage());
@@ -344,16 +353,14 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
             }
         };
     }
-    void sendNotification(String name, String message, String token) {
+    void sendNotification(String name, String action, String token) {
         try {
-            String title="Friend Request";
             RequestQueue queue = Volley.newRequestQueue(context);
 
             String url = "https://fcm.googleapis.com/fcm/send";
 
             JSONObject data = new JSONObject();
-            data.put("title", name);
-            data.put("body", message);
+            data.put("title", name+" "+action);
             JSONObject notificationData = new JSONObject();
             notificationData.put("notification", data);
             notificationData.put("to",token);
@@ -379,10 +386,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                     return map;
                 }
             };
-
             queue.add(request);
-
-
         } catch (Exception ex) {
 
         }
