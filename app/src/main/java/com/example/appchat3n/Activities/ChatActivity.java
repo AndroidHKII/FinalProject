@@ -322,6 +322,7 @@ public class ChatActivity extends AppCompatActivity {
 
     void sendNotification(String name, String message, String token) {
         try {
+
             RequestQueue queue = Volley.newRequestQueue(this);
 
             String url = "https://fcm.googleapis.com/fcm/send";
@@ -351,7 +352,6 @@ public class ChatActivity extends AppCompatActivity {
                     String key = "Key=AAAATWUPVuU:APA91bHXFPKWfKyCCF1TRSSl3o7YGqDHMThjX7itZOLQQ3JL5ZIzjGUA_QytOcEwBT3lerits2pI25xPmWXLrbkABVSveZ2GH6Mr8dbrvXMSyxL3cGJs9tFZJZU8x0Z9y8MeuSwn2S6s";
                     map.put("Content-Type", "application/json");
                     map.put("Authorization", key);
-
                     return map;
                 }
             };
@@ -362,8 +362,6 @@ public class ChatActivity extends AppCompatActivity {
         } catch (Exception ex) {
 
         }
-
-
     }
 
     @Override

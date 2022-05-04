@@ -1,15 +1,19 @@
 package com.example.appchat3n.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.example.appchat3n.Models.User;
 import com.example.appchat3n.databinding.ActivityOtpactivityBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,10 +23,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mukesh.OnOtpCompletionListener;
 
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class OTPActivity extends AppCompatActivity {
@@ -93,19 +102,12 @@ public class OTPActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(OTPActivity.this, SetupProfileActivity.class);
-
                             try {
-                                if (userIdExists(auth.getCurrentUser().getUid())) {
-                                    intent = new Intent(OTPActivity.this, MainActivity.class);
-                                } else {
-                                    intent = new Intent(OTPActivity.this, SetupProfileActivity.class);
-                                }
-                            } catch (Exception ex) {
-
-                            } finally {
-                                startActivity(intent);
-                                finishAffinity();
+                                moveTo(auth.getUid());
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.e("Check exist user:",ex.getMessage());
                             }
                         } else {
                             Toast.makeText(OTPActivity.this, "Failed.", Toast.LENGTH_SHORT).show();
@@ -115,9 +117,34 @@ public class OTPActivity extends AppCompatActivity {
             }
         });
     }
-    private boolean userIdExists(String userId) {
-        DatabaseReference fdbRefer = FirebaseDatabase.getInstance().getReference("users/" + userId);
-        return (fdbRefer != null);
-    }
+    private void moveTo(String userId) {
+        FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.N)
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        ArrayList<String> listIDUsers=new ArrayList<>();
+                        for(DataSnapshot snapshot1 : snapshot.getChildren()) {
+                            User user = snapshot1.getValue(User.class);
+                            if(!Objects.isNull(user.getUid()))
+                                if(!user.getUid().equals(FirebaseAuth.getInstance().getUid()))
+                                    listIDUsers.add(user.getUid());
+                        }
+                        boolean check=false;
+                        check=listIDUsers.contains(userId);
+                        if(check)
+                            startActivity(new Intent(OTPActivity.this, MainActivity.class));
+                        else
+                            startActivity(new Intent(OTPActivity.this, SetupProfileActivity.class));
+                        finishAffinity();
 
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        String test2="";
+                    }
+                });
+    }
 }

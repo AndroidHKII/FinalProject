@@ -56,12 +56,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 public class MainActivity extends AppCompatActivity {
 
-    CountDownLatch countDownListUser = new CountDownLatch(1);
 
     ActivityMainBinding binding;
     FirebaseDatabase database;
@@ -191,8 +191,9 @@ public class MainActivity extends AppCompatActivity {
                 users.clear();
                 for(DataSnapshot snapshot1 : snapshot.getChildren()) {
                     User user = snapshot1.getValue(User.class);
-                    if(!user.getUid().equals(FirebaseAuth.getInstance().getUid()))
-                        users.add(user);
+                    if(!Objects.isNull(user.getUid()))      //isn't completely regiser user
+                        if(!user.getUid().equals(FirebaseAuth.getInstance().getUid()))
+                            users.add(user);
                 }
                 binding.recyclerView.hideShimmerAdapter();
                 filterFriend();

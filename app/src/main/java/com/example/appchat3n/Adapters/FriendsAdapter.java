@@ -11,7 +11,14 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.example.appchat3n.Activities.ChatActivity;
 import com.example.appchat3n.Enums.FriendState;
 import com.example.appchat3n.Models.User;
 import com.example.appchat3n.R;
@@ -28,14 +35,17 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendViewHolder> implements Filterable {
     Context context;
     ArrayList<User> friends;
     ArrayList<User> listFriendOrigin;
-    User myUser;
 
     public FriendsAdapter(Context context, ArrayList<User> friends) {
         this.context = context;
@@ -333,6 +343,49 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 notifyDataSetChanged();
             }
         };
+    }
+    void sendNotification(String name, String message, String token) {
+        try {
+            String title="Friend Request";
+            RequestQueue queue = Volley.newRequestQueue(context);
+
+            String url = "https://fcm.googleapis.com/fcm/send";
+
+            JSONObject data = new JSONObject();
+            data.put("title", name);
+            data.put("body", message);
+            JSONObject notificationData = new JSONObject();
+            notificationData.put("notification", data);
+            notificationData.put("to",token);
+
+            JsonObjectRequest request = new JsonObjectRequest(url, notificationData
+                    , new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    // Toast.makeText(ChatActivity.this, "success", Toast.LENGTH_SHORT).show();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(context, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> map = new HashMap<>();
+                    String key = "Key=AAAATWUPVuU:APA91bHXFPKWfKyCCF1TRSSl3o7YGqDHMThjX7itZOLQQ3JL5ZIzjGUA_QytOcEwBT3lerits2pI25xPmWXLrbkABVSveZ2GH6Mr8dbrvXMSyxL3cGJs9tFZJZU8x0Z9y8MeuSwn2S6s";
+                    map.put("Content-Type", "application/json");
+                    map.put("Authorization", key);
+                    return map;
+                }
+            };
+
+            queue.add(request);
+
+
+        } catch (Exception ex) {
+
+        }
     }
 
 }
