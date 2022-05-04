@@ -11,7 +11,7 @@
         android:theme="@style/Theme.AppChat3N"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".PersonalChatDetail"
+            android:name=".Activities.PersonalChatDetail"
             android:exported="false" />
         <activity
             android:name=".Activities.FriendActivity"

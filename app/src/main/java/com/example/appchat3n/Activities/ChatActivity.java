@@ -31,7 +31,6 @@ import com.bumptech.glide.Glide;
 import com.example.appchat3n.Adapters.MessagesAdapter;
 import com.example.appchat3n.Constant.KeyIntentConstant;
 import com.example.appchat3n.Models.Message;
-import com.example.appchat3n.PersonalChatDetail;
 import com.example.appchat3n.R;
 import com.example.appchat3n.databinding.ActivityChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;

@@ -1,10 +1,11 @@
-package com.example.appchat3n;
+package com.example.appchat3n.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
 import com.bumptech.glide.Glide;
+import com.example.appchat3n.R;
 import com.example.appchat3n.databinding.ActivityPersonalChatDetailBinding;
 
 public class PersonalChatDetail extends AppCompatActivity {
