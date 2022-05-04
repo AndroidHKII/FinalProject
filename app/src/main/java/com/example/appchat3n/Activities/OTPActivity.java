@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.mukesh.OnOtpCompletionListener;
 
 import java.util.concurrent.TimeUnit;
@@ -27,7 +29,7 @@ public class OTPActivity extends AppCompatActivity {
 
     ActivityOtpactivityBinding binding;
     FirebaseAuth auth;
-
+    FirebaseDatabase database;
     String verificationId;
 
     ProgressDialog dialog;
@@ -44,7 +46,7 @@ public class OTPActivity extends AppCompatActivity {
         dialog.show();
 
         auth = FirebaseAuth.getInstance();
-
+        database = FirebaseDatabase.getInstance();
         getSupportActionBar().hide();
 
 
@@ -65,7 +67,7 @@ public class OTPActivity extends AppCompatActivity {
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
-
+                        Toast.makeText(OTPActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -90,10 +92,21 @@ public class OTPActivity extends AppCompatActivity {
                 auth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()) {
+                        if (task.isSuccessful()) {
                             Intent intent = new Intent(OTPActivity.this, SetupProfileActivity.class);
-                            startActivity(intent);
-                            finishAffinity();
+
+                            try {
+                                if (userIdExists(auth.getCurrentUser().getUid())) {
+                                    intent = new Intent(OTPActivity.this, MainActivity.class);
+                                } else {
+                                    intent = new Intent(OTPActivity.this, SetupProfileActivity.class);
+                                }
+                            } catch (Exception ex) {
+
+                            } finally {
+                                startActivity(intent);
+                                finishAffinity();
+                            }
                         } else {
                             Toast.makeText(OTPActivity.this, "Failed.", Toast.LENGTH_SHORT).show();
                         }
@@ -101,10 +114,10 @@ public class OTPActivity extends AppCompatActivity {
                 });
             }
         });
-
-
-
-
-
     }
+    private boolean userIdExists(String userId) {
+        DatabaseReference fdbRefer = FirebaseDatabase.getInstance().getReference("users/" + userId);
+        return (fdbRefer != null);
+    }
+
 }
