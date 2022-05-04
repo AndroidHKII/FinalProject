@@ -29,6 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.appchat3n.Adapters.MessagesAdapter;
+import com.example.appchat3n.Constant.KeyIntentConstant;
 import com.example.appchat3n.Models.Message;
 import com.example.appchat3n.R;
 import com.example.appchat3n.databinding.ActivityChatBinding;
@@ -65,8 +66,7 @@ import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private static final int REQUEST_GET_CONTENT = 25;
-    private static final int REQUEST_IMAGE_CAPTURE = 26;
+
     ActivityChatBinding binding;
 
     MessagesAdapter adapter;
@@ -273,7 +273,7 @@ public class ChatActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent, REQUEST_GET_CONTENT);
+                startActivityForResult(intent, KeyIntentConstant.REQUEST_GET_CONTENT);
             }
         });
 
@@ -281,7 +281,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                startActivityForResult(intent, KeyIntentConstant.REQUEST_IMAGE_CAPTURE);
             }
         });
 
@@ -368,7 +368,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_GET_CONTENT) {
+        if (requestCode == KeyIntentConstant.REQUEST_GET_CONTENT) {
             if (data != null) {
                 if (data.getData() != null) {
                     Uri selectedImage = data.getData();
@@ -428,11 +428,11 @@ public class ChatActivity extends AppCompatActivity {
                     });
                 }
             }
-        } else if (requestCode == REQUEST_IMAGE_CAPTURE) {
+        } else if (requestCode == KeyIntentConstant.REQUEST_IMAGE_CAPTURE) {
             if (data != null) {
                 Bitmap bmp = (Bitmap) data.getExtras().get("data");
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
                 bmp.recycle();
                 Calendar calendar = Calendar.getInstance();
