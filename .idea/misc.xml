@@ -6,7 +6,13 @@
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable-v24/ic_left_arrow.xml" value="0.2555" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable-v24/receive_drawable.xml" value="0.1715" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/circle_green.xml" value="0.195" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_block.xml" value="0.155" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_image.xml" value="0.155" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_music_note.xml" value="0.155" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_notification.xml" value="0.155" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_person_add.xml" value="0.155" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_send.xml" value="0.1" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_thumb_down.xml" value="0.155" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/sent_drawable.xml" value="0.1715" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout-normal/activity_setup_profile.xml" value="0.24635416666666668" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout-xlarge/activity_setup_profile.xml" value="0.125" />
@@ -18,6 +24,7 @@
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_group_chat.xml" value="0.20521590423257802" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_main.xml" value="0.264" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_otpactivity.xml" value="0.10989583333333333" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_personal_chat_detail.xml" value="0.13809320222317228" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_phone_number.xml" value="0.6" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_setup_profile.xml" value="0.25" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_sqlite_db.xml" value="0.20521590423257802" />

@@ -31,6 +31,7 @@ import com.bumptech.glide.Glide;
 import com.example.appchat3n.Adapters.MessagesAdapter;
 import com.example.appchat3n.Constant.KeyIntentConstant;
 import com.example.appchat3n.Models.Message;
+import com.example.appchat3n.PersonalChatDetail;
 import com.example.appchat3n.R;
 import com.example.appchat3n.databinding.ActivityChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -310,6 +311,16 @@ public class ChatActivity extends AppCompatActivity {
                     database.getReference().child("presence").child(senderUid).setValue("Online");
                 }
             };
+        });
+
+        binding.info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ChatActivity.this, PersonalChatDetail.class);
+                intent.putExtra("name", name);
+                intent.putExtra("image", profile);
+                startActivity(intent);
+            }
         });
 
 
