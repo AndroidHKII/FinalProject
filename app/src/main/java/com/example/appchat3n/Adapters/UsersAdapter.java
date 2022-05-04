@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,14 +26,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder> {
+public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder> implements Filterable {
 
     Context context;
-    ArrayList<User> users;
+    ArrayList<User> originListUser;
+    ArrayList<User> listUserSearch;
 
     public UsersAdapter(Context context, ArrayList<User> users) {
         this.context = context;
-        this.users = users;
+        this.originListUser = users;
+        this.listUserSearch=users;
     }
 
     @NonNull
@@ -44,7 +48,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
 
     @Override
     public void onBindViewHolder(@NonNull UsersViewHolder holder, int position) {
-        User user = users.get(position);
+        User user = listUserSearch.get(position);
         String senderId = FirebaseAuth.getInstance().getUid();
 
         String senderRoom = senderId + user.getUid();
@@ -94,7 +98,39 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
 
     @Override
     public int getItemCount() {
-        return users.size();
+        return listUserSearch.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String stringSearch=charSequence.toString();
+                if(stringSearch.isEmpty()) {
+                    listUserSearch = originListUser;
+                }
+                else
+                {
+                    ArrayList<User> searchFriends=new ArrayList<>();
+                    for(User user: originListUser)
+                    {
+                        if(user.getName().toLowerCase().contains(stringSearch)||user.getPhoneNumber().contains(stringSearch))
+                            searchFriends.add(user);
+                    }
+                    listUserSearch=searchFriends;
+                }
+                FilterResults filterResults=new FilterResults();
+                filterResults.values=listUserSearch;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                listUserSearch= (ArrayList<User>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public class UsersViewHolder extends RecyclerView.ViewHolder {

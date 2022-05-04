@@ -4,10 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -74,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<UserStatus> userStatuses;
 
     ProgressDialog dialog;
-
+    SearchView searchView;
     User user;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -313,7 +316,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.topmenu, menu);
-        return super.onCreateOptionsMenu(menu);
+
+        SearchManager searchManager=(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView= (SearchView) menu.findItem(R.id.action_search_friend).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                                              @Override
+                                              public boolean onQueryTextSubmit(String query) {
+                                                  usersAdapter.getFilter().filter(query);
+                                                  return false;
+                                              }
+
+                                              @Override
+                                              public boolean onQueryTextChange(String newText) {
+                                                  usersAdapter.getFilter().filter(newText);
+                                                  return false;
+                                              }
+                                          }
+        );
+
+
+
+        return true;
     }
     private void filterFriend()
     {
