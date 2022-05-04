@@ -128,8 +128,7 @@ public class OTPActivity extends AppCompatActivity {
                         for(DataSnapshot snapshot1 : snapshot.getChildren()) {
                             User user = snapshot1.getValue(User.class);
                             if(!Objects.isNull(user.getUid()))
-                                if(!user.getUid().equals(FirebaseAuth.getInstance().getUid()))
-                                    listIDUsers.add(user.getUid());
+                                listIDUsers.add(user.getUid());
                         }
                         boolean check=false;
                         check=listIDUsers.contains(userId);
@@ -143,7 +142,6 @@ public class OTPActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        String test2="";
                     }
                 });
     }
