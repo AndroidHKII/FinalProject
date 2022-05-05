@@ -44,6 +44,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -116,33 +117,7 @@ public class ChatActivity extends AppCompatActivity {
 
         conversation = new ArrayList<>();
 
-        childEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Message message = snapshot.getValue(Message.class);
-                showSmartReply(message);
-            }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
         String name = getIntent().getStringExtra("name");
         String profile = getIntent().getStringExtra("image");
         String token = getIntent().getStringExtra("token");
@@ -195,6 +170,21 @@ public class ChatActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(adapter);
 
+
+        database.getReference().child("chats").child(receiverRoom).child("lastMsg").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                lastMsg = new Message();
+                lastMsg.setMessage(snapshot.getValue(String.class));
+                showSmartReply(lastMsg);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         database.getReference().child("chats")
                 .child(senderRoom)
                 .child("messages")
@@ -211,7 +201,9 @@ public class ChatActivity extends AppCompatActivity {
                         adapter = new MessagesAdapter(ChatActivity.this, messages, senderRoom, receiverRoom);
                         adapter.notifyDataSetChanged();
 
+
                         binding.recyclerView.scrollToPosition(messages.size()-1);
+
 
 
                     }
@@ -258,7 +250,6 @@ public class ChatActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 sendNotification(name, message.getMessage(), token);
-                                showSmartReply(message);
                             }
                         });
                     }
