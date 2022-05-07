@@ -38,7 +38,7 @@ public class OTPActivity extends AppCompatActivity {
 
     ActivityOtpactivityBinding binding;
     FirebaseAuth auth;
-    FirebaseDatabase database;
+
     String verificationId;
 
     ProgressDialog dialog;
@@ -55,10 +55,8 @@ public class OTPActivity extends AppCompatActivity {
         dialog.show();
 
         auth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance();
+
         getSupportActionBar().hide();
-
-
 
         String phoneNumber = getIntent().getStringExtra("phoneNumber");
 
@@ -82,10 +80,11 @@ public class OTPActivity extends AppCompatActivity {
                     @Override
                     public void onCodeSent(@NonNull String verifyId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                         super.onCodeSent(verifyId, forceResendingToken);
+
                         dialog.dismiss();
                         verificationId = verifyId;
 
-                        InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                         binding.otpView.requestFocus();
                     }
@@ -102,13 +101,25 @@ public class OTPActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            try {
-                                moveTo(auth.getUid());
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.e("Check exist user:",ex.getMessage());
-                            }
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child("users")
+                                    .child(auth.getCurrentUser().getUid())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if(snapshot.exists()) {
+                                                goToMainActivity();
+                                            } else {
+                                                goToSetupActivity();
+                                            }
+                                            System.out.println(auth.getCurrentUser().getUid());
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                         } else {
                             Toast.makeText(OTPActivity.this, "Failed.", Toast.LENGTH_SHORT).show();
                         }
@@ -117,32 +128,16 @@ public class OTPActivity extends AppCompatActivity {
             }
         });
     }
-    private void moveTo(String userId) {
-        FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.N)
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        ArrayList<String> listIDUsers=new ArrayList<>();
-                        for(DataSnapshot snapshot1 : snapshot.getChildren()) {
-                            User user = snapshot1.getValue(User.class);
-                            if(!Objects.isNull(user.getUid()))
-                                listIDUsers.add(user.getUid());
-                        }
-                        boolean check=false;
-                        check=listIDUsers.contains(userId);
-                        if(check)
-                            startActivity(new Intent(OTPActivity.this, MainActivity.class));
-                        else
-                            startActivity(new Intent(OTPActivity.this, SetupProfileActivity.class));
-                        finishAffinity();
 
-                    }
+    private void goToSetupActivity() {
+        Intent intent = new Intent(OTPActivity.this, SetupProfileActivity.class);
+        startActivity(intent);
+        finishAffinity();
+    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
+    private void goToMainActivity() {
+        Intent intent = new Intent(OTPActivity.this, MainActivity.class);
+        startActivity(intent);
+        finishAffinity();
     }
 }
