@@ -1,6 +1,7 @@
 package com.example.appchat3n.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
@@ -22,6 +23,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.util.Date;
+import java.util.HashMap;
 
 public class EditProfileActivity extends AppCompatActivity {
 
@@ -64,9 +68,12 @@ public class EditProfileActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent, 45);
+//                startActivityForResult(intent, 45);
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1 );
             }
         });
+
+
 
         binding.btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,6 +146,47 @@ public class EditProfileActivity extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(data != null) {
+            if(data.getData() != null) {
+                Uri uri = data.getData(); // filepath
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                long time = new Date().getTime();
+                StorageReference reference = storage.getReference().child("Profiles").child(time+"");
+                reference.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if(task.isSuccessful()) {
+                            reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String filePath = uri.toString();
+                                    HashMap<String, Object> obj = new HashMap<>();
+                                    obj.put("image", filePath);
+                                    database.getReference().child("users")
+                                            .child(FirebaseAuth.getInstance().getUid())
+                                            .updateChildren(obj).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+
+
+                binding.imageView.setImageURI(data.getData());
+                selectedImage = data.getData();
+            }
+        }
+    }
 
 
 
