@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Add friend clicked.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
-                Toast.makeText(this, "Settings Clicked.", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
