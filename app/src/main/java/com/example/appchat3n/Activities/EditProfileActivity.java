@@ -13,8 +13,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class EditProfileActivity extends AppCompatActivity {
 
-    private static final String SHARED_PREFERENCE_USER_STATE = "USER";
-    FirebaseAuth auth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
