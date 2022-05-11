@@ -289,8 +289,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        String currentId = FirebaseAuth.getInstance().getUid();
-        database.getReference().child("presence").child(currentId).setValue("Offline");
+
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            String currentId = FirebaseAuth.getInstance().getUid();
+            database.getReference().child("presence").child(currentId).setValue("Offline");
+        }
     }
 
     @Override
@@ -308,6 +311,11 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.settings:
                 startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
+                break;
+            case R.id.logout:
+                FirebaseAuth.getInstance().signOut();
+                finish();
+                startActivity(new Intent(MainActivity.this, PhoneNumberActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
