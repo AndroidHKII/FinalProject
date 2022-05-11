@@ -20,6 +20,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -63,6 +65,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MainActivity extends AppCompatActivity {
 
 
@@ -80,12 +84,15 @@ public class MainActivity extends AppCompatActivity {
     SearchView searchView;
     User user;
 
+    CircleImageView profile;
+    TextView name;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
 
         FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
@@ -310,7 +317,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Add friend clicked.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
-                startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
+                Intent intent2 = new Intent(MainActivity.this, EditProfileActivity.class);
+                intent2.putExtra("name", user.getName());
+                intent2.putExtra("image", user.getProfileImage());
+                startActivity(intent2);
                 break;
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
