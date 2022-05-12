@@ -164,11 +164,7 @@ public class ChatActivity extends AppCompatActivity {
         senderRoom = senderUid + receiverUid;
         receiverRoom = receiverUid + senderUid;
 
-        adapter = new MessagesAdapter(this, messages, senderRoom, receiverRoom);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true);
-        binding.recyclerView.setLayoutManager(layoutManager);
-        binding.recyclerView.setAdapter(adapter);
+
 
 
         database.getReference().child("chats").child(receiverRoom).child("lastMsg").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -199,8 +195,10 @@ public class ChatActivity extends AppCompatActivity {
                             messages.add(message);
                         }
                         adapter = new MessagesAdapter(ChatActivity.this, messages, senderRoom, receiverRoom);
-                        adapter.notifyDataSetChanged();
-
+                        LinearLayoutManager layoutManager = new LinearLayoutManager(ChatActivity.this);
+                        layoutManager.setStackFromEnd(true);
+                        binding.recyclerView.setLayoutManager(layoutManager);
+                        binding.recyclerView.setAdapter(adapter);
 
                         binding.recyclerView.scrollToPosition(messages.size()-1);
 
