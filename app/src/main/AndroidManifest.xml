@@ -10,6 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppChat3N"
         android:usesCleartextTraffic="true">
+        <receiver
+            android:name=".Activities.WifiReceivers"
+            android:enabled="true"
+            android:exported="true"></receiver>
+
         <activity
             android:name=".Activities.EditProfileActivity"
             android:exported="false" />

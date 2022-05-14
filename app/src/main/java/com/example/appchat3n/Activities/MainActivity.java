@@ -12,10 +12,12 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -68,7 +70,7 @@ import java.util.concurrent.CountDownLatch;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
-
+    WifiReceivers wifiReceivers=new WifiReceivers();
 
     ActivityMainBinding binding;
     FirebaseDatabase database;
@@ -234,6 +236,18 @@ public class MainActivity extends AppCompatActivity {
         //users.get(users.size()-1);
     }
 
+    protected void onStart() {
+
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceivers, intentFilter);
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(wifiReceivers);
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

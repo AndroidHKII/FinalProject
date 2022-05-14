@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -66,7 +68,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
-
+    WifiReceivers wifiReceivers=new WifiReceivers();
 
     ActivityChatBinding binding;
 
@@ -317,6 +319,19 @@ public class ChatActivity extends AppCompatActivity {
 //        getSupportActionBar().setTitle(name);
 //
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    protected void onStart() {
+
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceivers, intentFilter);
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(wifiReceivers);
     }
 
     void sendNotification(String name, String message, String token) {
