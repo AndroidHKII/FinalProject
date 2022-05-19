@@ -1,6 +1,5 @@
 package com.example.appchat3n.Adapters;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,10 +13,7 @@ import com.bumptech.glide.Glide;
 import com.example.appchat3n.Models.Message;
 import com.example.appchat3n.Models.User;
 import com.example.appchat3n.R;
-import com.example.appchat3n.databinding.DeleteDialogBinding;
-import com.example.appchat3n.databinding.ItemReceiveBinding;
 import com.example.appchat3n.databinding.ItemReceiveGroupBinding;
-import com.example.appchat3n.databinding.ItemSentBinding;
 import com.example.appchat3n.databinding.ItemSentGroupBinding;
 import com.github.pgreze.reactions.ReactionPopup;
 import com.github.pgreze.reactions.ReactionsConfig;
@@ -46,7 +42,7 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if(viewType == ITEM_SENT) {
+        if (viewType == ITEM_SENT) {
             View view = LayoutInflater.from(context).inflate(R.layout.item_sent_group, parent, false);
             return new SentViewHolder(view);
         } else {
@@ -58,7 +54,7 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Message message = messages.get(position);
-        if(FirebaseAuth.getInstance().getUid().equals(message.getSenderId())) {
+        if (FirebaseAuth.getInstance().getUid().equals(message.getSenderId())) {
             return ITEM_SENT;
         } else {
             return ITEM_RECEIVE;
@@ -83,34 +79,30 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
                 .build();
 
         ReactionPopup popup = new ReactionPopup(context, config, (pos) -> {
-            if(holder.getClass() == SentViewHolder.class) {
-                SentViewHolder viewHolder = (SentViewHolder)holder;
+            if (holder.getClass() == SentViewHolder.class) {
+                SentViewHolder viewHolder = (SentViewHolder) holder;
                 viewHolder.binding.feeling.setImageResource(reactions[pos]);
                 viewHolder.binding.feeling.setVisibility(View.VISIBLE);
             } else {
-                ReceiverViewHolder viewHolder = (ReceiverViewHolder)holder;
+                ReceiverViewHolder viewHolder = (ReceiverViewHolder) holder;
                 viewHolder.binding.feeling.setImageResource(reactions[pos]);
                 viewHolder.binding.feeling.setVisibility(View.VISIBLE);
-
-
             }
 
             message.setFeeling(pos);
 
-            FirebaseDatabase.getInstance().getReference()
+            FirebaseDatabase.getInstance()
+                    .getReference()
                     .child("public")
                     .child(message.getMessageId()).setValue(message);
-
-
 
             return true; // true is closing popup, false is requesting a new selection
         });
 
+        if (holder.getClass() == SentViewHolder.class) {
+            SentViewHolder viewHolder = (SentViewHolder) holder;
 
-        if(holder.getClass() == SentViewHolder.class) {
-            SentViewHolder viewHolder = (SentViewHolder)holder;
-
-            if(message.getMessage().equals("photo")) {
+            if (message.getMessage().equals("photo")) {
                 viewHolder.binding.image.setVisibility(View.VISIBLE);
                 viewHolder.binding.message.setVisibility(View.GONE);
                 Glide.with(context)
@@ -119,13 +111,13 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
                         .into(viewHolder.binding.image);
             }
 
-            FirebaseDatabase.getInstance()
-                    .getReference().child("users")
+            FirebaseDatabase.getInstance().getReference()
+                    .child("users")
                     .child(message.getSenderId())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(snapshot.exists()) {
+                            if (snapshot.exists()) {
                                 User user = snapshot.getValue(User.class);
                                 viewHolder.binding.name.setText("@" + user.getName());
                             }
@@ -139,7 +131,7 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
 
             viewHolder.binding.message.setText(message.getMessage());
 
-            if(message.getFeeling() >= 0) {
+            if (message.getFeeling() >= 0) {
                 viewHolder.binding.feeling.setImageResource(reactions[message.getFeeling()]);
                 viewHolder.binding.feeling.setVisibility(View.VISIBLE);
             } else {
@@ -148,68 +140,23 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
 
             viewHolder.binding.message.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    popup.onTouch(v, event);
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    popup.onTouch(view, motionEvent);
                     return false;
                 }
             });
 
             viewHolder.binding.image.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    popup.onTouch(v, event);
-                    return false;
-                }
-            });
-
-            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    View view = LayoutInflater.from(context).inflate(R.layout.delete_dialog, null);
-                    DeleteDialogBinding binding = DeleteDialogBinding.bind(view);
-                    AlertDialog dialog = new AlertDialog.Builder(context)
-                            .setTitle("Delete Message")
-                            .setView(binding.getRoot())
-                            .create();
-
-                    binding.everyone.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            message.setMessage("This message is removed.");
-                            message.setFeeling(-1);
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("public")
-                                    .child(message.getMessageId()).setValue(message);
-
-                            dialog.dismiss();
-                        }
-                    });
-
-                    binding.delete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("public")
-                                    .child(message.getMessageId()).setValue(null);
-                            dialog.dismiss();
-                        }
-                    });
-
-                    binding.cancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    dialog.show();
-
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    popup.onTouch(view, motionEvent);
                     return false;
                 }
             });
         } else {
-            ReceiverViewHolder viewHolder = (ReceiverViewHolder)holder;
-            if(message.getMessage().equals("photo")) {
+            ReceiverViewHolder viewHolder = (ReceiverViewHolder) holder;
+
+            if (message.getMessage().equals("photo")) {
                 viewHolder.binding.image.setVisibility(View.VISIBLE);
                 viewHolder.binding.message.setVisibility(View.GONE);
                 Glide.with(context)
@@ -217,13 +164,14 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
                         .placeholder(R.drawable.placeholder)
                         .into(viewHolder.binding.image);
             }
-            FirebaseDatabase.getInstance()
-                    .getReference().child("users")
+
+            FirebaseDatabase.getInstance().getReference()
+                    .child("users")
                     .child(message.getSenderId())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(snapshot.exists()) {
+                            if (snapshot.exists()) {
                                 User user = snapshot.getValue(User.class);
                                 viewHolder.binding.name.setText("@" + user.getName());
                             }
@@ -234,10 +182,11 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
 
                         }
                     });
+
             viewHolder.binding.message.setText(message.getMessage());
 
-            if(message.getFeeling() >= 0) {
-                //message.setFeeling(reactions[message.getFeeling()]);
+            if (message.getFeeling() >= 0) {
+//                message.setFeeling(reactions[(int) message.getFeeling()]);
                 viewHolder.binding.feeling.setImageResource(reactions[message.getFeeling()]);
                 viewHolder.binding.feeling.setVisibility(View.VISIBLE);
             } else {
@@ -246,62 +195,16 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
 
             viewHolder.binding.message.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    popup.onTouch(v, event);
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    popup.onTouch(view, motionEvent);
                     return false;
                 }
             });
 
             viewHolder.binding.image.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    popup.onTouch(v, event);
-                    return false;
-                }
-            });
-
-            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    View view = LayoutInflater.from(context).inflate(R.layout.delete_dialog, null);
-                    DeleteDialogBinding binding = DeleteDialogBinding.bind(view);
-                    AlertDialog dialog = new AlertDialog.Builder(context)
-                            .setTitle("Delete Message")
-                            .setView(binding.getRoot())
-                            .create();
-
-                    binding.everyone.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            message.setMessage("This message is removed.");
-                            message.setFeeling(-1);
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("public")
-                                    .child(message.getMessageId()).setValue(message);
-
-                            dialog.dismiss();
-                        }
-                    });
-
-                    binding.delete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("public")
-                                    .child(message.getMessageId()).setValue(null);
-                            dialog.dismiss();
-                        }
-                    });
-
-                    binding.cancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    dialog.show();
-
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    popup.onTouch(view, motionEvent);
                     return false;
                 }
             });
@@ -325,11 +228,9 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter {
     public class ReceiverViewHolder extends RecyclerView.ViewHolder {
 
         ItemReceiveGroupBinding binding;
-
         public ReceiverViewHolder(@NonNull View itemView) {
             super(itemView);
             binding = ItemReceiveGroupBinding.bind(itemView);
         }
     }
-
 }

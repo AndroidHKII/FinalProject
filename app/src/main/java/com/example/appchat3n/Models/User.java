@@ -7,7 +7,6 @@ public class User implements Serializable {
     private String uid, name, phoneNumber, profileImage, token;
 
     public User() {
-
     }
 
     public User(String uid, String name, String phoneNumber, String profileImage) {

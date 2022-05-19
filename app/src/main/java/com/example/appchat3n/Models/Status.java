@@ -1,15 +1,16 @@
 package com.example.appchat3n.Models;
 
 public class Status {
+
     private String imageUrl;
-    private long timeStamp;
+    private long timestamp;
 
     public Status() {
     }
 
-    public Status(String imageUrl, long timeStamp) {
+    public Status(String imageUrl, long timestamp) {
         this.imageUrl = imageUrl;
-        this.timeStamp = timeStamp;
+        this.timestamp = timestamp;
     }
 
     public String getImageUrl() {
@@ -20,11 +21,11 @@ public class Status {
         this.imageUrl = imageUrl;
     }
 
-    public long getTimeStamp() {
-        return timeStamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

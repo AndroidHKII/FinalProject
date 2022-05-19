@@ -1,6 +1,8 @@
 package com.example.appchat3n.Models;
 
+
 public class Message {
+
     private String messageId, message, senderId, imageUrl;
     private long timestamp;
     private int feeling = -1;
@@ -62,4 +64,3 @@ public class Message {
         this.imageUrl = imageUrl;
     }
 }
-

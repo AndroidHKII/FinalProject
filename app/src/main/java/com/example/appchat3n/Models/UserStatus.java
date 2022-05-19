@@ -3,6 +3,7 @@ package com.example.appchat3n.Models;
 import java.util.ArrayList;
 
 public class UserStatus {
+
     private String name, profileImage;
     private long lastUpdated;
     private ArrayList<Status> statuses;
@@ -49,4 +50,3 @@ public class UserStatus {
         this.statuses = statuses;
     }
 }
-

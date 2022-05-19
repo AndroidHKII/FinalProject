@@ -16,6 +16,6 @@
         app:shimmer_demo_grid_child_count="2"
         app:shimmer_demo_layout="@layout/demo_layout"
         app:shimmer_demo_layout_manager_type="linear_vertical"
-        tools:listitem="@layout/item_friend"
-        />
+        app:shimmer_demo_reverse_animation="true"
+        tools:listitem="@layout/item_friend" />
 </RelativeLayout>

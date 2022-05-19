@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.appchat3n.Activities.MainActivity;
+import com.example.appchat3n.Activities.DashBoard;
 import com.example.appchat3n.Models.Status;
 import com.example.appchat3n.Models.UserStatus;
 import com.example.appchat3n.R;
@@ -40,7 +40,6 @@ public class TopStatusAdapter extends RecyclerView.Adapter<TopStatusAdapter.TopS
 
     @Override
     public void onBindViewHolder(@NonNull TopStatusViewHolder holder, int position) {
-
         UserStatus userStatus = userStatuses.get(position);
 
         Status lastStatus = userStatus.getStatuses().get(userStatus.getStatuses().size() - 1);
@@ -51,18 +50,19 @@ public class TopStatusAdapter extends RecyclerView.Adapter<TopStatusAdapter.TopS
 
         holder.binding.circularStatusView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 ArrayList<MyStory> myStories = new ArrayList<>();
-                for(Status status : userStatus.getStatuses()) {
+                for (Status status : userStatus.getStatuses()) {
                     myStories.add(new MyStory(status.getImageUrl()));
                 }
 
-                new StoryView.Builder(((MainActivity)context).getSupportFragmentManager())
+                new StoryView.Builder(((DashBoard)context).getSupportFragmentManager())
                         .setStoriesList(myStories) // Required
                         .setStoryDuration(5000) // Default is 2000 Millis (2 Seconds)
                         .setTitleText(userStatus.getName()) // Default is Hidden
                         .setSubtitleText("") // Default is Hidden
-                        .setTitleLogoUrl(userStatus.getProfileImage()) // Default is Hidden
+                        .setTitleLogoUrl(userStatus.getProfileImage().equals("No Image") ?
+                                "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" : userStatus.getProfileImage()) // Default is Hidden
                         .setStoryClickListeners(new StoryClickListeners() {
                             @Override
                             public void onDescriptionClickListener(int position) {

@@ -1,14 +1,14 @@
 package com.example.appchat3n.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.appchat3n.Models.User;
 import com.example.appchat3n.databinding.ActivitySetupProfileBinding;
@@ -20,9 +20,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
-import java.util.Date;
-import java.util.HashMap;
 
 public class SetupProfileActivity extends AppCompatActivity {
 
@@ -51,7 +48,7 @@ public class SetupProfileActivity extends AppCompatActivity {
 
         binding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
@@ -61,21 +58,21 @@ public class SetupProfileActivity extends AppCompatActivity {
 
         binding.continueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 String name = binding.nameBox.getText().toString();
 
-                if(name.isEmpty()) {
+                if (name.isEmpty()) {
                     binding.nameBox.setError("Please type a name");
                     return;
                 }
 
                 dialog.show();
-                if(selectedImage != null) {
-                    StorageReference reference = storage.getReference().child("Profiles").child(auth.getUid());
+                if (selectedImage != null) {
+                    StorageReference reference = storage.getReference().child("profiles").child(auth.getUid());
                     reference.putFile(selectedImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            if(task.isSuccessful()) {
+                            if (task.isSuccessful()) {
                                 reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
@@ -93,9 +90,9 @@ public class SetupProfileActivity extends AppCompatActivity {
                                                 .setValue(user)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
-                                                    public void onSuccess(Void aVoid) {
+                                                    public void onSuccess(Void unused) {
                                                         dialog.dismiss();
-                                                        Intent intent = new Intent(SetupProfileActivity.this, MainActivity.class);
+                                                        Intent intent = new Intent(SetupProfileActivity.this, DashBoard.class);
                                                         startActivity(intent);
                                                         finish();
                                                     }
@@ -117,15 +114,14 @@ public class SetupProfileActivity extends AppCompatActivity {
                             .setValue(user)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
-                                public void onSuccess(Void aVoid) {
+                                public void onSuccess(Void unused) {
                                     dialog.dismiss();
-                                    Intent intent = new Intent(SetupProfileActivity.this, MainActivity.class);
+                                    Intent intent = new Intent(SetupProfileActivity.this, DashBoard.class);
                                     startActivity(intent);
                                     finish();
                                 }
                             });
                 }
-
             }
         });
     }
@@ -134,37 +130,8 @@ public class SetupProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(data != null) {
-            if(data.getData() != null) {
-                Uri uri = data.getData(); // filepath
-                FirebaseStorage storage = FirebaseStorage.getInstance();
-                long time = new Date().getTime();
-                StorageReference reference = storage.getReference().child("Profiles").child(time+"");
-                reference.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if(task.isSuccessful()) {
-                            reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    String filePath = uri.toString();
-                                    HashMap<String, Object> obj = new HashMap<>();
-                                    obj.put("image", filePath);
-                                    database.getReference().child("users")
-                                            .child(FirebaseAuth.getInstance().getUid())
-                                            .updateChildren(obj).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    }
-                });
-
-
+        if (data != null) {
+            if (data.getData() != null) {
                 binding.imageView.setImageURI(data.getData());
                 selectedImage = data.getData();
             }
