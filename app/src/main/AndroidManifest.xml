@@ -19,6 +19,11 @@
         android:theme="@style/Theme.ChatsApp"
         android:usesCleartextTraffic="true"
         tools:replace="android:theme">
+        <service
+            android:name=".MyService"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <activity
             android:name=".Activities.CreateGroupActivity"
             android:exported="false" />

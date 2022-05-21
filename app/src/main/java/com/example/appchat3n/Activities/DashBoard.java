@@ -1,5 +1,6 @@
 package com.example.appchat3n.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.appchat3n.Fragments.GroupFragment;
 import com.example.appchat3n.Fragments.MainFragment;
+import com.example.appchat3n.MyService;
 import com.example.appchat3n.R;
 import com.example.appchat3n.Utils.Util;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
@@ -24,6 +26,10 @@ public class DashBoard extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+
+        Intent i = new Intent(this, MyService.class);
+        startService(i);
+
         navigationBar = findViewById(R.id.navigationChip);
 
         if (savedInstanceState == null) {
