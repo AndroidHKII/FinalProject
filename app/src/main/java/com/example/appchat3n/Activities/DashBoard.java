@@ -58,7 +58,7 @@ public class DashBoard extends AppCompatActivity {
     protected void onResume() {
         Util.updateOnlineStatus("Online");
         Intent i = new Intent(this, MyService.class);
-        stopService(i);
+        this.stopService(i);
         super.onResume();
     }
 
@@ -66,7 +66,7 @@ public class DashBoard extends AppCompatActivity {
     protected void onPause() {
         Util.updateOnlineStatus("Offline");
         Intent i = new Intent(this, MyService.class);
-        startService(i);
+        this.startService(i);
         super.onPause();
     }
 
