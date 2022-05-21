@@ -22,6 +22,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.example.appchat3n.Constants.AllConstants;
 import com.example.appchat3n.Enums.FriendState;
 import com.example.appchat3n.Models.User;
 import com.example.appchat3n.R;
@@ -164,6 +165,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                             if (Objects.isNull(error)) {
                                 sendNotification(currentUser.getName(), "send you a friend request!", friend.getToken());
                                 Toast.makeText(context, "Send friend request to " + friend.getName() + " successfully!", Toast.LENGTH_LONG).show();
+
                             } else {
                                 Log.e("Request friend error: ", error.getMessage());
                                 Log.e("Restore: ","Remove request friend from current User");
@@ -345,7 +347,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     HashMap<String, String> map = new HashMap<>();
-                    String key = "Key=AAAAqcARJAE:APA91bHHYtVDUwlqcOrGOTJhvm3Oa8j0_uUr5yYkzo74EFJEut6cG0zGkuBi39udSbaWSkhhm0w2EqP9xYgqJL9xgUaerhm8uc_QqoJIfgNO5__Ad7HDczvbeoA7E3-0wkaOccUXKkzV";
+                    String key = "Key="+ AllConstants.SERVER_KEY;
                     map.put("Content-Type", "application/json");
                     map.put("Authorization", key);
                     return map;
