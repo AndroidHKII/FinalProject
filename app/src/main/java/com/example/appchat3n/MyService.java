@@ -18,9 +18,15 @@ import com.example.appchat3n.Activities.DashBoard;
 
 public class MyService extends Service {
     private static final String TAG = "com.example.appchat3n";
-
+    boolean isRun;
     public MyService() {
 
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        isRun=true;
     }
 
     @Override
@@ -53,7 +59,8 @@ public class MyService extends Service {
 
     @Override
     public void onDestroy() {
-       Log.i(TAG, "OnDestroy called");
+        super.onDestroy();
+        Log.i(TAG, "OnDestroy called");
     }
 
     @Override

@@ -27,8 +27,7 @@ public class DashBoard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-        Intent i = new Intent(this, MyService.class);
-        startService(i);
+
 
         navigationBar = findViewById(R.id.navigationChip);
 
@@ -58,12 +57,16 @@ public class DashBoard extends AppCompatActivity {
     @Override
     protected void onResume() {
         Util.updateOnlineStatus("Online");
+        Intent i = new Intent(this, MyService.class);
+        stopService(i);
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         Util.updateOnlineStatus("Offline");
+        Intent i = new Intent(this, MyService.class);
+        startService(i);
         super.onPause();
     }
 
