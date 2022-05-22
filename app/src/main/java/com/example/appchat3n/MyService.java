@@ -30,21 +30,22 @@ public class MyService extends Service {
     }
 
     @Override
-    public  int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "OnStart Called");
-
         Runnable r = new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < 50; i++) {
-
-                    long futuretime = System.currentTimeMillis() + 10000;
+                    long futuretime = System.currentTimeMillis() + 1000;
                     while (System.currentTimeMillis() < futuretime) {
                         synchronized (this) {
                             try {
                                 wait(futuretime-System.currentTimeMillis());
-                                sendNotification("AppChat3N", "Tương tác đi bạn ơi");
                                 Log.i(TAG, "Service is running");
+                                sendNotification("AppChat3N", "Tương tác đi bạn ơi");
+                                if(!isRun){
+                                    return;
+                                }
                             } catch (Exception e) {
                             }
                         }
@@ -60,7 +61,8 @@ public class MyService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "OnDestroy called");
+        Log.i(TAG, "Service is stop");
+        isRun= false;
     }
 
     @Override

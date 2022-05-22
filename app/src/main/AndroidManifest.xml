@@ -20,9 +20,12 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:theme">
         <service
+            android:name=".MyIntentService"
+            android:exported="false"></service>
+        <service
             android:name=".MyService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity
             android:name=".Activities.CreateGroupActivity"
