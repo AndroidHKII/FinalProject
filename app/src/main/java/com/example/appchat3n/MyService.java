@@ -52,11 +52,11 @@ public class MyService extends Service {
                     }
                 }
             }
-            };
-            Thread myThread = new Thread(r);
-            myThread.start();
-            return Service.START_STICKY;
-        }
+        };
+        Thread myThread = new Thread(r);
+        myThread.start();
+        return Service.START_STICKY;
+    }
 
     @Override
     public void onDestroy() {
@@ -67,7 +67,7 @@ public class MyService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-       return null;
+        return null;
     }
 
     private void sendNotification(String title, String messageBody) {
