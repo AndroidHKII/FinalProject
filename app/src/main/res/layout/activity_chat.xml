@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
+        android:theme="@style/Theme.ChatsApp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" >
@@ -29,8 +29,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                app:srcCompat="@drawable/ic_left_arrow"
-                app:tint="@color/white" />
+                app:tint="@color/white"
+                app:srcCompat="@drawable/ic_left_arrow" />
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profile"
@@ -44,21 +44,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="15dp"
-                android:gravity="center"
+                android:gravity="left|center_vertical"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sang Phan"
+                    android:text="User"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/status"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Online"
@@ -72,8 +72,19 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"></LinearLayout>
+        android:layout_height="45dp"
+        app:layout_constraintBottom_toTopOf="@+id/cardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/llSmartReplies"
+        android:orientation="vertical">
+
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cgSmartReplies"/>
+
+    </LinearLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -111,16 +122,16 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_marginRight="12dp"
-                app:srcCompat="@drawable/ic_attachment"
-                app:tint="#676767" />
+                app:tint="#676767"
+                app:srcCompat="@drawable/ic_attachment" />
 
             <ImageView
                 android:id="@+id/camera"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_marginRight="12dp"
-                app:srcCompat="@drawable/ic_camera"
-                app:tint="#676767" />
+                app:tint="#676767"
+                app:srcCompat="@drawable/ic_camera" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -131,18 +142,18 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/circle_green"
         android:padding="10dp"
+        app:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/cardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/cardView"
-        app:srcCompat="@drawable/ic_send"
-        app:tint="@color/white" />
+        app:srcCompat="@drawable/ic_send" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
+        app:layout_constraintBottom_toTopOf="@+id/llSmartReplies"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />

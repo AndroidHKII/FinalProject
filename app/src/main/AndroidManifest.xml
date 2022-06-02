@@ -19,9 +19,7 @@
         android:theme="@style/Theme.ChatsApp"
         android:usesCleartextTraffic="true"
         tools:replace="android:theme">
-        <service
-            android:name=".MyIntentService"
-            android:exported="false"></service>
+
         <service
             android:name=".MyService"
             android:enabled="true"
@@ -85,6 +83,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
             </intent-filter>
         </service>
     </application>

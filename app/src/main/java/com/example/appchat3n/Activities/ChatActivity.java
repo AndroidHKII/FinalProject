@@ -1,5 +1,11 @@
 package com.example.appchat3n.Activities;
 
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -15,12 +21,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
@@ -29,15 +32,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import com.example.appchat3n.Adapters.MessagesAdapter;
-import com.example.appchat3n.Constants.AllConstants;
-import com.example.appchat3n.Models.Message;
-import com.example.appchat3n.Models.User;
-import com.example.appchat3n.R;
-import com.example.appchat3n.databinding.ActivityChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
+import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,6 +46,17 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.example.appchat3n.Adapters.MessagesAdapter;
+import com.example.appchat3n.Constants.AllConstants;
+import com.example.appchat3n.Models.Message;
+import com.example.appchat3n.Models.User;
+import com.example.appchat3n.R;
+import com.example.appchat3n.databinding.ActivityChatBinding;
+import com.google.mlkit.nl.smartreply.SmartReply;
+import com.google.mlkit.nl.smartreply.SmartReplyGenerator;
+import com.google.mlkit.nl.smartreply.SmartReplySuggestion;
+import com.google.mlkit.nl.smartreply.SmartReplySuggestionResult;
+import com.google.mlkit.nl.smartreply.TextMessage;
 
 import org.json.JSONObject;
 
@@ -54,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
@@ -69,6 +81,12 @@ public class ChatActivity extends AppCompatActivity {
 
     ProgressDialog dialog;
     String senderUid, receiverUid;
+    List<TextMessage> conversation;
+    EditText messageBox;
+    ChipGroup cgSmartReplies;
+    String messageTxt;
+    Message lastMsg;
+
     User currentUser = new User();
 
     @Override
@@ -76,6 +94,10 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
+        cgSmartReplies = findViewById(R.id.cgSmartReplies);
+        messageBox = findViewById(R.id.messageBox);
 
         setSupportActionBar(binding.toolbar);
 
@@ -87,6 +109,7 @@ public class ChatActivity extends AppCompatActivity {
         dialog.setCancelable(false);
 
         messages = new ArrayList<>();
+        conversation = new ArrayList<>();
 
         String name = getIntent().getStringExtra("name");
         String profile = getIntent().getStringExtra("image");
@@ -190,6 +213,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 Date date = new Date();
                 Message message = new Message(messageTxt, senderUid, date.getTime());
+                lastMsg = message;
                 binding.messageBox.setText("");
 
                 String randomKey = database.getReference().push().getKey();
@@ -197,6 +221,8 @@ public class ChatActivity extends AppCompatActivity {
                 HashMap<String, Object> lastMsgObj = new HashMap<>();
                 lastMsgObj.put("lastMsg", message.getMessage());
                 lastMsgObj.put("lastMsgTime", date.getTime());
+
+                conversation.add(TextMessage.createForLocalUser(message.getMessage(),System.currentTimeMillis()));
 
                 database.getReference().child("chatLists").child(senderUid).child(receiverUid).updateChildren(lastMsgObj);
                 database.getReference().child("chatLists").child(receiverUid).child(senderUid).updateChildren(lastMsgObj);
@@ -216,6 +242,7 @@ public class ChatActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void unused) {
                                 sendNotification(name, message.getMessage(), token);
+                                showSmartReply(message);
                             }
                         });
                     }
@@ -319,6 +346,50 @@ public class ChatActivity extends AppCompatActivity {
             queue.add(request);
         } catch (Exception ex) {
 
+        }
+    }
+
+    private void showSmartReply(Message messages) {
+        conversation.clear();
+        cgSmartReplies.removeAllViews();
+        conversation.add(TextMessage.createForRemoteUser(messages.getMessage(),System.currentTimeMillis(), senderUid));
+        if(!conversation.isEmpty()) {
+            SmartReplyGenerator smartReply = SmartReply.getClient();
+            smartReply.suggestReplies(conversation).addOnSuccessListener(new OnSuccessListener<SmartReplySuggestionResult>() {
+                @Override
+                public void onSuccess(SmartReplySuggestionResult result) {
+                    if(result.getStatus()==SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
+                        Toast.makeText(ChatActivity.this, "Language not support", Toast.LENGTH_SHORT).show();
+                    } else if (result.getStatus()==SmartReplySuggestionResult.STATUS_SUCCESS) {
+                        for (SmartReplySuggestion suggestion:result.getSuggestions()) {
+                            String replyText = suggestion.getText();
+                            Chip chip = new Chip(ChatActivity.this);
+                            ChipDrawable drawable = ChipDrawable.createFromAttributes(ChatActivity.this,
+                                    null, 0, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Action);
+                            chip.setChipDrawable(drawable);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+                            params.setMargins(16,16,16,16);
+                            chip.setLayoutParams(params);
+                            chip.setText(replyText);
+                            chip.setTag(replyText);
+
+
+                            chip.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    messageBox.setText(view.getTag().toString());
+                                    Toast.makeText(ChatActivity.this, view.getTag().toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            cgSmartReplies.addView(chip);
+                        }
+                    }
+                }
+            });
         }
     }
 
