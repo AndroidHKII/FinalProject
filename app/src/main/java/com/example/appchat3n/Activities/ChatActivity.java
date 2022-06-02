@@ -161,6 +161,21 @@ public class ChatActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(adapter);
 
+
+        database.getReference().child("chatLists").child(receiverUid).child(senderUid).child("lastMsg").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                lastMsg = new Message();
+                lastMsg.setMessage(snapshot.getValue(String.class));
+                showSmartReply(lastMsg);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         database.getReference().child("chatMessages")
                 .child(senderUid)
                 .child(receiverUid)

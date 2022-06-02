@@ -71,4 +71,5 @@ dependencies {
 
     //smart reply
     implementation 'com.google.mlkit:smart-reply:17.0.0'
+
 }
