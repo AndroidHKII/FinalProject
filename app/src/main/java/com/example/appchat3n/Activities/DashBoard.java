@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.appchat3n.Fragments.GroupFragment;
 import com.example.appchat3n.Fragments.MainFragment;
+import com.example.appchat3n.Fragments.ProfileFragment;
 import com.example.appchat3n.MyService;
 import com.example.appchat3n.R;
 import com.example.appchat3n.Utils.Util;
@@ -21,14 +22,12 @@ public class DashBoard extends AppCompatActivity {
     private ChipNavigationBar navigationBar;
     Fragment mainFragment = new MainFragment();
     Fragment groupFragment = new GroupFragment();
+    Fragment profileFragment = new ProfileFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
-
-
-
         navigationBar = findViewById(R.id.navigationChip);
 
         if (savedInstanceState == null) {
@@ -48,7 +47,7 @@ public class DashBoard extends AppCompatActivity {
                         replaceFragment(groupFragment);
                         break;
                     case R.id.profile:
-//                        fragment = new ProfileFragment();
+                        replaceFragment(profileFragment);
                 }
             }
         });
@@ -57,16 +56,12 @@ public class DashBoard extends AppCompatActivity {
     @Override
     protected void onResume() {
         Util.updateOnlineStatus("Online");
-        Intent i = new Intent(this, MyService.class);
-        this.stopService(i);
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         Util.updateOnlineStatus("Offline");
-        Intent i = new Intent(this, MyService.class);
-        this.startService(i);
         super.onPause();
     }
 
@@ -77,5 +72,9 @@ public class DashBoard extends AppCompatActivity {
         fragmentTransaction.replace(R.id.dashboardContainer, fragment);
         fragmentTransaction.addToBackStack(fragment.toString());
         fragmentTransaction.commit();
+    }
+
+    public void onBackPressed() {
+        finish();
     }
 }

@@ -7,13 +7,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,16 +16,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
-import com.example.appchat3n.Activities.FriendActivity;
-import com.example.appchat3n.Adapters.ChatListAdapter;
-import com.example.appchat3n.Adapters.TopStatusAdapter;
-import com.example.appchat3n.Constants.AllConstants;
-import com.example.appchat3n.Models.Status;
-import com.example.appchat3n.Models.User;
-import com.example.appchat3n.Models.UserStatus;
-import com.example.appchat3n.R;
-import com.example.appchat3n.Utils.Util;
 import com.example.appchat3n.databinding.FragmentMainBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,6 +38,16 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.example.appchat3n.Activities.FriendActivity;
+import com.example.appchat3n.Adapters.TopStatusAdapter;
+import com.example.appchat3n.Adapters.ChatListAdapter;
+import com.example.appchat3n.Constants.AllConstants;
+import com.example.appchat3n.Models.Status;
+import com.example.appchat3n.Models.User;
+import com.example.appchat3n.Models.UserStatus;
+import com.example.appchat3n.R;
+import com.example.appchat3n.Utils.Util;
+import com.example.appchat3n.databinding.FragmentMainBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -304,49 +306,6 @@ public class MainFragment extends Fragment {
 
         return super.onOptionsItemSelected(item);
     }
-
-//    void showChatList() {
-//        listFriends.clear();
-//        if (listFriendIds.isEmpty()) {
-//            Toast.makeText(getActivity(), "No Friends", Toast.LENGTH_SHORT).show();
-//        } else {
-//            database.getReference().child("users").addValueEventListener(new ValueEventListener() {
-//                @RequiresApi(api = Build.VERSION_CODES.N)
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                    users.clear();
-//                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-//                        User user = snapshot1.getValue(User.class);
-//                        if (!Objects.isNull(user.getUid()) && listFriendIds.contains(user.getUid())) {
-//                            users.add(user);
-//                        }
-//                    }
-//
-//                    if (users.size() > 0) {
-//                        for (String friendId : listFriendIds) {
-//                            for (User user : users) {
-//                                if (friendId.equals(user.getUid())) {
-//                                    listFriends.add(user);
-//                                }
-//                            }
-//                        }
-////                        for (User user : users) {
-////                            if (listFriendIds.contains(user.getUid()))
-////                                listFriends.add(user);
-////                        }
-//                        showStoriesOfFriend(listFriendIds);
-////                        sortUsers();
-//                        usersAdapter.notifyDataSetChanged();
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                }
-//            });
-//        }
-//    }
 
     void showStoriesOfFriend(ArrayList<String> listIDFriend) {
         database.getReference().child("stories").addValueEventListener(new ValueEventListener() {
