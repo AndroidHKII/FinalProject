@@ -12,10 +12,12 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +40,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.devlomi.record_view.OnRecordListener;
+import com.example.appchat3n.WifiReceivers;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -80,6 +83,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
+
+    WifiReceivers wifiReceivers=new WifiReceivers();
 
     ActivityChatBinding binding;
     MessagesAdapter adapter;
@@ -353,6 +358,19 @@ public class ChatActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         initView();
+    }
+
+    protected void onStart() {
+
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceivers, intentFilter);
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(wifiReceivers);
     }
 
     void sendNotification(String name, String message, String token) {

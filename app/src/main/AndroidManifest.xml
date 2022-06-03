@@ -29,10 +29,11 @@
             android:name=".MyService"
             android:enabled="true"
             android:exported="true" />
+        <receiver
+            android:name=".WifiReceivers"
+            android:enabled="true"
+            android:exported="true"></receiver>
 
-        <activity
-            android:name=".Activities.CreateGroupActivity"
-            android:exported="false" />
         <activity
             android:name=".Activities.DashBoard"
             android:exported="false" />
@@ -45,9 +46,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Activities.SettingActivity"
-            android:exported="false" />
+
         <activity
             android:name=".Activities.FriendActivity"
             android:exported="false" />

@@ -36,7 +36,7 @@ public class MyService extends Service {
             @Override
             public void run() {
                 for (int i = 0; i < 50; i++) {
-                    long futuretime = System.currentTimeMillis() + 5000;
+                    long futuretime = System.currentTimeMillis() + 500000;
                     while (System.currentTimeMillis() < futuretime) {
                         synchronized (this) {
                             try {
