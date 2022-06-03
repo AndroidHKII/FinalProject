@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.appchat3n.Fragments.GroupFragment;
 import com.example.appchat3n.Fragments.MainFragment;
 import com.example.appchat3n.Fragments.ProfileFragment;
 import com.example.appchat3n.MyService;
@@ -21,7 +20,7 @@ public class DashBoard extends AppCompatActivity {
 
     private ChipNavigationBar navigationBar;
     Fragment mainFragment = new MainFragment();
-    Fragment groupFragment = new GroupFragment();
+
     Fragment profileFragment = new ProfileFragment();
 
     @Override
@@ -43,9 +42,7 @@ public class DashBoard extends AppCompatActivity {
                     case R.id.chat:
                         replaceFragment(mainFragment);
                         break;
-                    case R.id.group:
-                        replaceFragment(groupFragment);
-                        break;
+
                     case R.id.profile:
                         replaceFragment(profileFragment);
                 }
