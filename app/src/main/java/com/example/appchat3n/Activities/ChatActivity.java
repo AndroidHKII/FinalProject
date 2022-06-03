@@ -12,13 +12,16 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -32,6 +35,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.devlomi.record_view.OnRecordListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -41,6 +45,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -61,6 +66,11 @@ import com.google.mlkit.nl.smartreply.TextMessage;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+
+import com.example.appchat3n.Permissions;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -73,14 +83,15 @@ public class ChatActivity extends AppCompatActivity {
     ActivityChatBinding binding;
     MessagesAdapter adapter;
     ArrayList<Message> messages;
-
+    private Permissions permissions;
 //    String senderRoom, receiverRoom;
-
+    private MediaRecorder mediaRecorder;
+    String name, profile, token;
     FirebaseDatabase database;
     FirebaseStorage storage;
 
     ProgressDialog dialog;
-    String senderUid, receiverUid;
+    String senderUid, receiverUid, audioPath;
     List<TextMessage> conversation;
     EditText messageBox;
     ChipGroup cgSmartReplies;
@@ -111,9 +122,10 @@ public class ChatActivity extends AppCompatActivity {
         messages = new ArrayList<>();
         conversation = new ArrayList<>();
 
-        String name = getIntent().getStringExtra("name");
-        String profile = getIntent().getStringExtra("image");
-        String token = getIntent().getStringExtra("token");
+        permissions = new Permissions();
+        name = getIntent().getStringExtra("name");
+        profile = getIntent().getStringExtra("image");
+        token = getIntent().getStringExtra("token");
 
 //        Toast.makeText(this, token, Toast.LENGTH_SHORT).show();
 
@@ -227,7 +239,7 @@ public class ChatActivity extends AppCompatActivity {
                     return;
 
                 Date date = new Date();
-                Message message = new Message(messageTxt, senderUid, date.getTime());
+                Message message = new Message(messageTxt, senderUid, date.getTime(), "text");
                 lastMsg = message;
                 binding.messageBox.setText("");
 
@@ -298,6 +310,13 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                binding.sendBtn.setVisibility(View.VISIBLE);
+                binding.recordButton.setVisibility(View.GONE);
+
+                if(binding.messageBox.getText().toString().trim().equals("")) {
+                    binding.sendBtn.setVisibility(View.GONE);
+                    binding.recordButton.setVisibility(View.VISIBLE);
+                }
                 database.getReference().child("presence").child(senderUid).setValue("Typing...");
                 handler.removeCallbacks(null);
                 handler.postDelayed(userStopTyping, 1000);
@@ -322,6 +341,8 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        initView();
     }
 
     void sendNotification(String name, String message, String token) {
@@ -407,6 +428,167 @@ public class ChatActivity extends AppCompatActivity {
             });
         }
     }
+
+
+    private void initView() {
+
+        binding.recordButton.setRecordView(binding.recordView);
+        binding.recordButton.setListenForRecord(false);
+
+        binding.recordButton.setOnClickListener(view -> {
+
+            if (permissions.isRecordingOk(ChatActivity.this))
+                if (permissions.isStorageOk(ChatActivity.this))
+                    binding.recordButton.setListenForRecord(true);
+                else permissions.requestStorage(ChatActivity.this);
+            else permissions.requestRecording(ChatActivity.this);
+
+
+        });
+
+        binding.recordView.setOnRecordListener(new OnRecordListener() {
+            @Override
+            public void onStart() {
+                //Start Recording..
+                Log.d("RecordView", "onStart");
+
+                setUpRecording();
+
+                try {
+                    mediaRecorder.prepare();
+                    mediaRecorder.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                binding.messageBox.setVisibility(View.GONE);
+                binding.recordView.setVisibility(View.VISIBLE);
+
+            }
+
+            @Override
+            public void onCancel() {
+                //On Swipe To Cancel
+                Log.d("RecordView", "onCancel");
+
+                mediaRecorder.reset();
+                mediaRecorder.release();
+                File file = new File(audioPath);
+                if (file.exists())
+                    file.delete();
+
+                binding.recordView.setVisibility(View.GONE);
+                binding.messageBox.setVisibility(View.VISIBLE);
+
+
+            }
+
+            @Override
+            public void onFinish(long recordTime) {
+                //Stop Recording..
+                Log.d("RecordView", "onFinish");
+
+                try {
+                    mediaRecorder.stop();
+                    mediaRecorder.release();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                binding.recordView.setVisibility(View.GONE);
+                binding.messageBox.setVisibility(View.VISIBLE);
+
+                sendRecodingMessage(audioPath);
+
+
+            }
+
+            @Override
+            public void onLessThanSecond() {
+                //When the record time is less than One Second
+                Log.d("RecordView", "onLessThanSecond");
+
+                mediaRecorder.reset();
+                mediaRecorder.release();
+
+                File file = new File(audioPath);
+                if (file.exists())
+                    file.delete();
+
+
+                binding.recordView.setVisibility(View.GONE);
+                //binding.dataLayout.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void setUpRecording() {
+
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "ChatsApp/Media/Recording");
+
+        if (!file.exists())
+            file.mkdirs();
+        audioPath = file.getAbsolutePath() + File.separator + System.currentTimeMillis() + ".3gp";
+
+        mediaRecorder.setOutputFile(audioPath);
+    }
+
+    private void sendRecodingMessage(String audioPath) {
+
+
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference(  "Media/Recording/" + senderUid + "/" + System.currentTimeMillis());
+            Uri audioFile = Uri.fromFile(new File(audioPath));
+            storageReference.putFile(audioFile).addOnSuccessListener(success -> {
+                Task<Uri> audioUrl = success.getStorage().getDownloadUrl();
+
+                audioUrl.addOnCompleteListener(path -> {
+                    if (path.isSuccessful()) {
+
+                        String url = path.getResult().toString();
+
+
+                        Date date = new Date();
+                        Message message = new Message(url, senderUid, date.getTime(), "recording");
+
+                        String randomKey = database.getReference().push().getKey();
+
+                        HashMap<String, Object> lastMsgObj = new HashMap<>();
+                        lastMsgObj.put("lastMsg", "audio");
+                        lastMsgObj.put("lastMsgTime", date.getTime());
+
+                        database.getReference().child("chatLists").child(senderUid).child(receiverUid).updateChildren(lastMsgObj);
+                        database.getReference().child("chatLists").child(receiverUid).child(senderUid).updateChildren(lastMsgObj);
+
+                        database.getReference().child("chatMessages")
+                                .child(senderUid)
+                                .child(receiverUid)
+                                .child(randomKey)
+                                .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                database.getReference().child("chatMessages")
+                                        .child(receiverUid)
+                                        .child(senderUid)
+                                        .child(randomKey)
+                                        .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        sendNotification(name, "audio", token);
+                                    }
+                                });
+                            }
+                        });
+
+                    }
+                });
+            });
+        }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

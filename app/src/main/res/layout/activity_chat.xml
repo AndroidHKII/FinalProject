@@ -95,7 +95,8 @@
         android:layout_marginBottom="8dp"
         app:cardCornerRadius="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/sendBtn"
+
+        app:layout_constraintEnd_toStartOf="@+id/buttons"
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
@@ -104,6 +105,15 @@
             android:gravity="center"
             android:orientation="horizontal">
 
+            <com.devlomi.record_view.RecordView
+                android:id="@+id/recordView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.8"
+                android:visibility="gone"
+                app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
+                app:slide_to_cancel_arrow_color="@color/black"
+                app:slide_to_cancel_text="Slide to cancel" />
             <EditText
                 android:id="@+id/messageBox"
                 android:layout_width="wrap_content"
@@ -132,8 +142,28 @@
                 android:layout_marginRight="12dp"
                 app:tint="#676767"
                 app:srcCompat="@drawable/ic_camera" />
+
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+<RelativeLayout
+    android:id="@+id/buttons"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="@+id/cardView"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="@+id/cardView">
+    <com.devlomi.record_view.RecordButton
+        android:id="@+id/recordButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/circle_green"
+        android:padding="10dp"
+        android:visibility="visible"
+        app:tint="@color/white"
+        app:mic_icon="@drawable/ic_mic" />
 
     <ImageView
         android:id="@+id/sendBtn"
@@ -142,11 +172,12 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/circle_green"
         android:padding="10dp"
+        android:visibility="gone"
         app:tint="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/cardView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/cardView"
+
         app:srcCompat="@drawable/ic_send" />
+</RelativeLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

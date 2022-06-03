@@ -122,6 +122,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
         if (holder.getClass() == SentViewHolder.class) {
             SentViewHolder viewHolder = (SentViewHolder) holder;
 
+
             if (message.getMessage().equals("photo")) {
                 viewHolder.binding.image.setVisibility(View.VISIBLE);
                 viewHolder.binding.message.setVisibility(View.GONE);
@@ -129,6 +130,12 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                         .load(message.getImageUrl())
                         .placeholder(R.drawable.placeholder)
                         .into(viewHolder.binding.image);
+            }
+
+            else if (message.getType().equals("recording")) {
+                viewHolder.binding.voicePlayerView.setVisibility(View.VISIBLE);
+                viewHolder.binding.message.setVisibility(View.GONE);
+                viewHolder.binding.voicePlayerView.setAudio(message.getMessage());
             }
 
             viewHolder.binding.message.setText(message.getMessage());
@@ -220,6 +227,11 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                         .load(message.getImageUrl())
                         .placeholder(R.drawable.placeholder)
                         .into(viewHolder.binding.image);
+            }
+            else if (message.getType().equals("recording")) {
+                viewHolder.binding.voicePlayerView.setVisibility(View.VISIBLE);
+                viewHolder.binding.message.setVisibility(View.GONE);
+                viewHolder.binding.voicePlayerView.setAudio(message.getMessage());
             }
 
             viewHolder.binding.message.setText(message.getMessage());
