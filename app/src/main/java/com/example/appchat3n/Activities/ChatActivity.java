@@ -636,6 +636,7 @@ public class ChatActivity extends AppCompatActivity {
                                                 Date date = new Date();
                                                 Message message = new Message(messageTxt, senderUid, date.getTime());
                                                 message.setMessage("photo");
+                                                message.setType("photo");
                                                 message.setImageUrl(filePath);
                                                 binding.messageBox.setText("");
 
@@ -704,6 +705,7 @@ public class ChatActivity extends AppCompatActivity {
                                             Date date = new Date();
                                             Message message = new Message(messageTxt, senderUid, date.getTime());
                                             message.setMessage("photo");
+                                            message.setType("photo");
                                             message.setImageUrl(filePath);
                                             binding.messageBox.setText("");
 
