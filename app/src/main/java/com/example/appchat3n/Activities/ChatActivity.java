@@ -174,11 +174,14 @@ public class ChatActivity extends AppCompatActivity {
         binding.recyclerView.setAdapter(adapter);
 
 
-        database.getReference().child("chatLists").child(receiverUid).child(senderUid).child("lastMsg").addValueEventListener(new ValueEventListener() {
+        database.getReference().child("chatLists").child(receiverUid).child(senderUid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                HashMap<String,Object> map = new HashMap<>();
+                map = (HashMap<String, Object>) snapshot.getValue();
                 lastMsg = new Message();
-                lastMsg.setMessage(snapshot.getValue(String.class));
+                lastMsg.setMessage((String) map.get("lastMsg"));
+                lastMsg.setSenderId((String) map.get("senderUid"));
                 showSmartReply(lastMsg);
             }
 
@@ -248,6 +251,7 @@ public class ChatActivity extends AppCompatActivity {
                 HashMap<String, Object> lastMsgObj = new HashMap<>();
                 lastMsgObj.put("lastMsg", message.getMessage());
                 lastMsgObj.put("lastMsgTime", date.getTime());
+                lastMsgObj.put("senderUid", senderUid);
 
                 conversation.add(TextMessage.createForLocalUser(message.getMessage(),System.currentTimeMillis()));
 
@@ -269,7 +273,7 @@ public class ChatActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void unused) {
                                 sendNotification(name, message.getMessage(), token);
-                                showSmartReply(message);
+                               // showSmartReply(message);
                             }
                         });
                     }
@@ -389,44 +393,46 @@ public class ChatActivity extends AppCompatActivity {
         conversation.clear();
         cgSmartReplies.removeAllViews();
         conversation.add(TextMessage.createForRemoteUser(messages.getMessage(),System.currentTimeMillis(), senderUid));
-        if(!conversation.isEmpty()) {
-            SmartReplyGenerator smartReply = SmartReply.getClient();
-            smartReply.suggestReplies(conversation).addOnSuccessListener(new OnSuccessListener<SmartReplySuggestionResult>() {
-                @Override
-                public void onSuccess(SmartReplySuggestionResult result) {
-                    if(result.getStatus()==SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
-                        //Toast.makeText(ChatActivity.this, "Language not support", Toast.LENGTH_SHORT).show();
-                    } else if (result.getStatus()==SmartReplySuggestionResult.STATUS_SUCCESS) {
-                        for (SmartReplySuggestion suggestion:result.getSuggestions()) {
-                            String replyText = suggestion.getText();
-                            Chip chip = new Chip(ChatActivity.this);
-                            ChipDrawable drawable = ChipDrawable.createFromAttributes(ChatActivity.this,
-                                    null, 0, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Action);
-                            chip.setChipDrawable(drawable);
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT
-                            );
-                            params.setMargins(16,16,16,16);
-                            chip.setLayoutParams(params);
-                            chip.setText(replyText);
-                            chip.setTag(replyText);
+       if(messages.getSenderId().equals(receiverUid)) {
+           if (!conversation.isEmpty()) {
+               SmartReplyGenerator smartReply = SmartReply.getClient();
+               smartReply.suggestReplies(conversation).addOnSuccessListener(new OnSuccessListener<SmartReplySuggestionResult>() {
+                   @Override
+                   public void onSuccess(SmartReplySuggestionResult result) {
+                       if (result.getStatus() == SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
+                           //Toast.makeText(ChatActivity.this, "Language not support", Toast.LENGTH_SHORT).show();
+                       } else if (result.getStatus() == SmartReplySuggestionResult.STATUS_SUCCESS) {
+                           for (SmartReplySuggestion suggestion : result.getSuggestions()) {
+                               String replyText = suggestion.getText();
+                               Chip chip = new Chip(ChatActivity.this);
+                               ChipDrawable drawable = ChipDrawable.createFromAttributes(ChatActivity.this,
+                                       null, 0, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Action);
+                               chip.setChipDrawable(drawable);
+                               LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                       LinearLayout.LayoutParams.WRAP_CONTENT,
+                                       LinearLayout.LayoutParams.WRAP_CONTENT
+                               );
+                               params.setMargins(16, 16, 16, 16);
+                               chip.setLayoutParams(params);
+                               chip.setText(replyText);
+                               chip.setTag(replyText);
 
 
-                            chip.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    messageBox.setText(view.getTag().toString());
-                                    Toast.makeText(ChatActivity.this, view.getTag().toString(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                               chip.setOnClickListener(new View.OnClickListener() {
+                                   @Override
+                                   public void onClick(View view) {
+                                       messageBox.setText(view.getTag().toString());
+                                       Toast.makeText(ChatActivity.this, view.getTag().toString(), Toast.LENGTH_SHORT).show();
+                                   }
+                               });
 
-                            cgSmartReplies.addView(chip);
-                        }
-                    }
-                }
-            });
-        }
+                               cgSmartReplies.addView(chip);
+                           }
+                       }
+                   }
+               });
+           }
+       }
     }
 
 
