@@ -56,12 +56,16 @@ public class DashBoard extends AppCompatActivity {
     @Override
     protected void onResume() {
         Util.updateOnlineStatus("Online");
+        Intent i = new Intent(this, MyService.class);
+        this.stopService(i);
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         Util.updateOnlineStatus("Offline");
+        Intent i = new Intent(this, MyService.class);
+        this.startService(i);
         super.onPause();
     }
 
