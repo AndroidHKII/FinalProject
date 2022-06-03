@@ -793,7 +793,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    callCameraIntent();
+                    callPhoneIntentWithPhoneNumber();
                 }
 
                 break;

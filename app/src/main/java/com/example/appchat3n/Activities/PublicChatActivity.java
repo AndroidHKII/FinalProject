@@ -1,10 +1,15 @@
 package com.example.appchat3n.Activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.appchat3n.Adapters.PublicMessagesAdapter;
+import com.example.appchat3n.Constants.AllConstants;
 import com.example.appchat3n.Models.Message;
 import com.example.appchat3n.databinding.ActivityPublicChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,9 +32,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 public class PublicChatActivity extends AppCompatActivity {
 
@@ -113,11 +121,24 @@ public class PublicChatActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent, 25);
+                startActivityForResult(intent, AllConstants.REQUEST_GET_CONTENT);
+            }
+        });
+        binding.camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, AllConstants.CAMERA_PERMISSION_CODE);
+                }
+                else
+                {
+                    callCameraIntent();
+                }
             }
         });
     }
-
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -159,10 +180,134 @@ public class PublicChatActivity extends AppCompatActivity {
             }
         }
     }
+     */
 
     @Override
     public boolean onSupportNavigateUp() {
         finish();
         return super.onSupportNavigateUp();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == AllConstants.CAMERA_PERMISSION_CODE)
+        {
+            if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+                callCameraIntent();
+            }
+            else
+            {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    private void callCameraIntent()
+    {
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, AllConstants.REQUEST_IMAGE_CAPTURE);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case AllConstants.REQUEST_GET_CONTENT:
+                    if (data != null) {
+                        if (data.getData() != null) {
+                            Uri selectedImage = data.getData();
+                            Calendar calendar = Calendar.getInstance();
+                            StorageReference reference = storage.getReference().child("chatMedias").child(calendar.getTimeInMillis() + "");
+                            dialog.show();
+                            reference.putFile(selectedImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                    dialog.dismiss();
+                                    if (task.isSuccessful()) {
+                                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                String filePath = uri.toString();
+
+                                                String messageTxt = binding.messageBox.getText().toString();
+
+                                                Date date = new Date();
+                                                Message message = new Message(messageTxt, senderUid, date.getTime());
+                                                message.setMessage("photo");
+                                                message.setType("photo");
+                                                message.setImageUrl(filePath);
+                                                binding.messageBox.setText("");
+
+                                                String randomKey = database.getReference().push().getKey();
+
+                                                database.getReference().child("public")
+                                                        .child(randomKey)
+                                                        .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    break;
+
+                case AllConstants.REQUEST_IMAGE_CAPTURE:
+                    if (data != null) {
+                        Bitmap bmp = (Bitmap) data.getExtras().get("data");
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] byteArray = stream.toByteArray();
+                        bmp.recycle();
+
+                        Calendar calendar = Calendar.getInstance();
+                        StorageReference reference = storage.getReference().child("chatMedias").child(calendar.getTimeInMillis() + "");
+                        dialog.show();
+                        reference.putBytes(byteArray).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                dialog.dismiss();
+                                if (task.isSuccessful()) {
+                                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            String filePath = uri.toString();
+
+                                            String messageTxt = binding.messageBox.getText().toString();
+
+                                            Date date = new Date();
+                                            Message message = new Message(messageTxt, senderUid, date.getTime());
+                                            message.setMessage("photo");
+                                            message.setType("photo");
+                                            message.setImageUrl(filePath);
+                                            binding.messageBox.setText("");
+
+                                            String randomKey = database.getReference().push().getKey();
+
+
+                                            database.getReference().child("public")
+                                                    .child(randomKey)
+                                                    .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    break;
+            }
+        }
     }
 }
