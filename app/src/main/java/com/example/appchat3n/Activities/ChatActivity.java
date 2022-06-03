@@ -6,11 +6,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -23,6 +25,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -86,7 +89,7 @@ public class ChatActivity extends AppCompatActivity {
     private Permissions permissions;
 //    String senderRoom, receiverRoom;
     private MediaRecorder mediaRecorder;
-    String name, profile, token;
+    String name, profile, token,receiverPhoneNumber;
     FirebaseDatabase database;
     FirebaseStorage storage;
 
@@ -126,7 +129,7 @@ public class ChatActivity extends AppCompatActivity {
         name = getIntent().getStringExtra("name");
         profile = getIntent().getStringExtra("image");
         token = getIntent().getStringExtra("token");
-
+        receiverPhoneNumber=getIntent().getStringExtra("phone");
 //        Toast.makeText(this, token, Toast.LENGTH_SHORT).show();
 
         binding.name.setText(name);
@@ -294,9 +297,14 @@ public class ChatActivity extends AppCompatActivity {
         binding.camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-                startActivityForResult(intent, AllConstants.REQUEST_IMAGE_CAPTURE);
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, AllConstants.CAMERA_PERMISSION_CODE);
+                }
+                else
+                {
+                    callCameraIntent();
+                }
             }
         });
 
@@ -771,5 +779,66 @@ public class ChatActivity extends AppCompatActivity {
         } else {
             return data.getByteCount();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.callPhone:
+                if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+                {
+                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, AllConstants.CALL_PERMISSION_CODE);
+                }
+                else
+                {
+                    callCameraIntent();
+                }
+
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == AllConstants.CAMERA_PERMISSION_CODE)
+        {
+            if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+                callCameraIntent();
+            }
+            else
+            {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+        else
+        if(requestCode==AllConstants.CALL_PERMISSION_CODE)
+        {
+            if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(this, "call permission granted", Toast.LENGTH_LONG).show();
+                callPhoneIntentWithPhoneNumber();
+            }
+            else
+            {
+                Toast.makeText(this, "call permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    private void callPhoneIntentWithPhoneNumber()
+    {
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + receiverPhoneNumber));
+        startActivity(intent);
+    }
+    private void callCameraIntent()
+    {
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, AllConstants.REQUEST_IMAGE_CAPTURE);
     }
 }

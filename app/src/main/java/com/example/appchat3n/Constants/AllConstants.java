@@ -6,6 +6,8 @@ public interface AllConstants {
     int STORAGE_REQUEST_CODE = 1000;
     int CONTACTS_REQUEST_CODE = 2000;
     int RECORDING_REQUEST_CODE = 3000;
+    int CAMERA_PERMISSION_CODE = 3222;
+    int CALL_PERMISSION_CODE = 72839;
 
 
     String NOTIFICATION_URL = "https://fcm.googleapis.com/fcm/send";

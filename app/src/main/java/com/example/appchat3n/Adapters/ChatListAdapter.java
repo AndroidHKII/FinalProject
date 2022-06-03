@@ -85,6 +85,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
                 intent.putExtra("image", user.getProfileImage());
                 intent.putExtra("uid", user.getUid());
                 intent.putExtra("token", user.getToken());
+                intent.putExtra("phone",user.getPhoneNumber());
                 context.startActivity(intent);
             }
         });

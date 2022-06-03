@@ -67,7 +67,10 @@ public class OTPActivity extends AppCompatActivity {
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
-                        Toast.makeText(OTPActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(OTPActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        Intent intent=new Intent(OTPActivity.this,PhoneNumberActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
 
                     @Override

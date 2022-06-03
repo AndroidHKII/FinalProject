@@ -7,6 +7,7 @@
         android:title="Video Call"
         app:showAsAction="always" />
     <item
+        android:id="@+id/callPhone"
         android:icon="@drawable/ic_call"
         android:title="Audio Call"
         app:showAsAction="always" />
