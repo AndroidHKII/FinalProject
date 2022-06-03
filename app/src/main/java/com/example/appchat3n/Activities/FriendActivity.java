@@ -46,7 +46,7 @@ public class FriendActivity extends AppCompatActivity {
 
         //Get list users from intent
         Intent intent = getIntent();
-//        users = (ArrayList<User>) intent.getSerializableExtra("UserList");
+
         User currentUser= (User) intent.getSerializableExtra("CurrentUser");
 
         users = new ArrayList<>();

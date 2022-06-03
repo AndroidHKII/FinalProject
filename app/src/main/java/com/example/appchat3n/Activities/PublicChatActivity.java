@@ -58,7 +58,7 @@ public class PublicChatActivity extends AppCompatActivity {
         binding = ActivityPublicChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        getSupportActionBar().setTitle("Group Chat");
+        getSupportActionBar().setTitle("Public Chat");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         senderUid = FirebaseAuth.getInstance().getUid();
@@ -138,49 +138,7 @@ public class PublicChatActivity extends AppCompatActivity {
             }
         });
     }
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 25) {
-            if (data != null) {
-                if (data.getData() != null) {
-                    Uri selectedImage = data.getData();
-                    Calendar calendar = Calendar.getInstance();
-                    StorageReference reference = storage.getReference().child("chats").child(calendar.getTimeInMillis() + "");
-                    dialog.show();
-                    reference.putFile(selectedImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            dialog.dismiss();
-                            if (task.isSuccessful()) {
-                                reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {
-                                        String filePath = uri.toString();
-
-                                        String messageTxt = binding.messageBox.getText().toString();
-
-                                        Date date = new Date();
-                                        Message message = new Message(messageTxt, senderUid, date.getTime());
-                                        message.setMessage("photo");
-                                        message.setImageUrl(filePath);
-                                        binding.messageBox.setText("");
-
-                                        database.getReference().child("public")
-                                                .push()
-                                                .setValue(message);
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            }
-        }
-    }
-     */
 
     @Override
     public boolean onSupportNavigateUp() {

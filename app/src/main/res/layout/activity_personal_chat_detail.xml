@@ -128,7 +128,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
-                    android:text="Hey there! I am using WhatsApp."
+                    android:text="Hey there! I am using AppChat3N."
                     android:textColor="@color/black"
                     android:textSize="16sp" />
             </androidx.cardview.widget.CardView>

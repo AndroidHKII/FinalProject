@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.appchat3n.Activities.PhoneNumberActivity;
 import com.example.appchat3n.Activities.PublicChatActivity;
 import com.example.appchat3n.databinding.FragmentMainBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -48,7 +49,7 @@ import com.example.appchat3n.Models.User;
 import com.example.appchat3n.Models.UserStatus;
 import com.example.appchat3n.R;
 import com.example.appchat3n.Utils.Util;
-import com.example.appchat3n.databinding.FragmentMainBinding;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,7 +79,7 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMainBinding.bind(inflater.inflate(R.layout.fragment_main, container, false));
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("ChatsApp");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("AppChat3N");
         setHasOptionsMenu(true);
 
         binding.statusArea.setVisibility(View.GONE);
@@ -298,12 +299,10 @@ public class MainFragment extends Fragment {
                 startActivity(intent);
                 break;
             case R.id.logout:
-//                FirebaseAuth.getInstance().signOut();
-//                finish();
-//                startActivity(new Intent(this, PhoneNumberActivity.class));
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getActivity(), PhoneNumberActivity.class));
+                getActivity().finish();
                 break;
-            case R.id.settings:
-
             case R.id.group:
                 startActivity(new Intent(getActivity(), PublicChatActivity.class));
 

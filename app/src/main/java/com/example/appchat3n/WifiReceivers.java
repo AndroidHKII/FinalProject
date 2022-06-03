@@ -1,4 +1,4 @@
-package com.example.appchat3n.Activities;
+package com.example.appchat3n;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
