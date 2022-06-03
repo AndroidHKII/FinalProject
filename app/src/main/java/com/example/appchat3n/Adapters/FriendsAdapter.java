@@ -267,8 +267,9 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
     public void removeFriend(User friend) {
         databaseReference.child("friends").child(currentUser.getUid()).child(friend.getUid()).removeValue();
         databaseReference.child("friends").child(friend.getUid()).child(currentUser.getUid()).removeValue();
-        databaseReference.child("chatMessages").child(currentUser.getUid()).child(friend.getUid()).removeValue();
-        databaseReference.child("chatMessages").child(friend.getUid()).child(currentUser.getUid()).removeValue();
+        //Remove message when unfriend
+        //databaseReference.child("chatMessages").child(currentUser.getUid()).child(friend.getUid()).removeValue();
+       // databaseReference.child("chatMessages").child(friend.getUid()).child(currentUser.getUid()).removeValue();
         databaseReference.child("chatLists").child(currentUser.getUid()).child(friend.getUid()).removeValue();
         databaseReference.child("chatLists").child(friend.getUid()).child(currentUser.getUid()).removeValue();
 

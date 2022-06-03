@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.appchat3n.Activities.PublicChatActivity;
 import com.example.appchat3n.databinding.FragmentMainBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -302,6 +303,11 @@ public class MainFragment extends Fragment {
 //                startActivity(new Intent(this, PhoneNumberActivity.class));
                 break;
             case R.id.settings:
+
+            case R.id.group:
+                startActivity(new Intent(getActivity(), PublicChatActivity.class));
+
+
         }
 
         return super.onOptionsItemSelected(item);

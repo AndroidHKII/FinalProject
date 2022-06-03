@@ -12,8 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.appchat3n.Adapters.GroupMessagesAdapter;
+import com.example.appchat3n.Adapters.MessagesAdapter;
+import com.example.appchat3n.Adapters.PublicMessagesAdapter;
 import com.example.appchat3n.Models.Message;
-import com.example.appchat3n.databinding.ActivityGroupChatBinding;
+import com.example.appchat3n.databinding.ActivityPublicChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -30,11 +32,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class GroupChatActivity extends AppCompatActivity {
+public class PublicChatActivity extends AppCompatActivity {
 
-    ActivityGroupChatBinding binding;
+    ActivityPublicChatBinding binding;
 
-    GroupMessagesAdapter adapter;
+    PublicMessagesAdapter adapter;
     ArrayList<Message> messages;
 
     FirebaseDatabase database;
@@ -47,7 +49,7 @@ public class GroupChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityGroupChatBinding.inflate(getLayoutInflater());
+        binding = ActivityPublicChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         getSupportActionBar().setTitle("Group Chat");
@@ -62,7 +64,7 @@ public class GroupChatActivity extends AppCompatActivity {
         dialog.setCancelable(false);
 
         messages = new ArrayList<>();
-        adapter = new GroupMessagesAdapter(this, messages);
+        adapter = new PublicMessagesAdapter(this, messages);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerView.setAdapter(adapter);
 
@@ -77,7 +79,13 @@ public class GroupChatActivity extends AppCompatActivity {
                             messages.add(message);
                         }
 
-                        adapter.notifyDataSetChanged();
+                        adapter = new PublicMessagesAdapter(PublicChatActivity.this, messages);
+                        LinearLayoutManager layoutManager = new LinearLayoutManager(PublicChatActivity.this);
+                        layoutManager.setStackFromEnd(true);
+                        binding.recyclerView.setLayoutManager(layoutManager);
+                        binding.recyclerView.setAdapter(adapter);
+//                        adapter.notifyDataSetChanged();
+                        binding.recyclerView.scrollToPosition(adapter.getItemCount() - 1);
                     }
 
                     @Override

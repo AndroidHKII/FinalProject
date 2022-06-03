@@ -9,8 +9,8 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/imgSplash"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
         android:layout_centerInParent="true"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
@@ -23,7 +23,7 @@
         android:layout_below="@id/imgSplash"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:text="ChatsApp"
+        android:text="AppChat3N"
         android:textColor="@color/colorPrimary"
         android:textSize="20dp"
         android:textStyle="bold" />

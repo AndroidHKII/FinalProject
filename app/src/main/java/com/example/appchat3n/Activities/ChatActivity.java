@@ -395,7 +395,7 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(SmartReplySuggestionResult result) {
                     if(result.getStatus()==SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
-                        Toast.makeText(ChatActivity.this, "Language not support", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(ChatActivity.this, "Language not support", Toast.LENGTH_SHORT).show();
                     } else if (result.getStatus()==SmartReplySuggestionResult.STATUS_SUCCESS) {
                         for (SmartReplySuggestion suggestion:result.getSuggestions()) {
                             String replyText = suggestion.getText();
