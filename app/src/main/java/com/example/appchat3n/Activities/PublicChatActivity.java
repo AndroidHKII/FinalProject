@@ -11,8 +11,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.appchat3n.Adapters.GroupMessagesAdapter;
-import com.example.appchat3n.Adapters.MessagesAdapter;
 import com.example.appchat3n.Adapters.PublicMessagesAdapter;
 import com.example.appchat3n.Models.Message;
 import com.example.appchat3n.databinding.ActivityPublicChatBinding;

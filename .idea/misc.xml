@@ -40,11 +40,12 @@
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/demo_status.xml" value="0.20222317229585293" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/fragment_main.xml" value="0.11201368106028217" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/fragment_profile.xml" value="0.1" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/group_chat_item_layout.xml" value="0.2" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/item_friend.xml" value="0.11799914493373237" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/item_receive.xml" value="0.536" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/item_receive_group.xml" value="0.20521590423257802" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/item_sent.xml" value="0.4" />
-        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/item_sent_group.xml" value="0.20521590423257802" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/item_sent_group.xml" value="0.536" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/item_status.xml" value="0.20521590423257802" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/right_audio_item_layout.xml" value="0.264" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/row_conversation.xml" value="0.536" />
