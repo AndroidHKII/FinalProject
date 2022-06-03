@@ -322,13 +322,13 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-//                binding.sendBtn.setVisibility(View.VISIBLE);
-//                binding.recordButton.setVisibility(View.GONE);
-//
-//                if(binding.messageBox.getText().toString().trim().equals("")) {
-//                   binding.sendBtn.setVisibility(View.GONE);
-//                    binding.recordButton.setVisibility(View.VISIBLE);
-//                }
+                binding.sendBtn.setVisibility(View.VISIBLE);
+                binding.recordButton.setVisibility(View.GONE);
+
+                if(binding.messageBox.getText().toString().trim().equals("")) {
+                   binding.sendBtn.setVisibility(View.GONE);
+                    binding.recordButton.setVisibility(View.VISIBLE);
+                }
                 database.getReference().child("presence").child(senderUid).setValue("Typing...");
                 handler.removeCallbacks(null);
                 handler.postDelayed(userStopTyping, 1000);
