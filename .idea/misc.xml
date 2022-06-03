@@ -8,6 +8,7 @@
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/card_border.xml" value="0.1735" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/circle_green.xml" value="0.195" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_block.xml" value="0.155" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_group.xml" value="0.1865" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_image.xml" value="0.155" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_mic.xml" value="0.162" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/drawable/ic_music_note.xml" value="0.155" />
@@ -23,7 +24,7 @@
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout-xlarge/item_receive_group.xml" value="0.125" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout-xlarge/item_sent_group.xml" value="0.125" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout-xlarge/item_status.xml" value="0.125" />
-        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_chat.xml" value="0.4" />
+        <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_chat.xml" value="0.25" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_edit_profile.xml" value="0.20521590423257802" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_friend.xml" value="0.25" />
         <entry key="..\:/HKII/Android/AppChat3N/app/src/main/res/layout/activity_group_chat.xml" value="0.20521590423257802" />

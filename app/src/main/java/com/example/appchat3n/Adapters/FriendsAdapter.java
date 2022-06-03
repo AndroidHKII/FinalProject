@@ -239,6 +239,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                         public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                             if (Objects.isNull(error)) {
                                 HashMap<String, Object> lastMsgObj = new HashMap<>();
+                                lastMsgObj.put("senderUid", currentUser.getUid());
                                 lastMsgObj.put("lastMsg", "Tap to chat");
                                 lastMsgObj.put("lastMsgTime", new Date().getTime());
 

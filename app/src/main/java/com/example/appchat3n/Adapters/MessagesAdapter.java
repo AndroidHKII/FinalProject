@@ -137,6 +137,8 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                 viewHolder.binding.voicePlayerView.setVisibility(View.VISIBLE);
                 viewHolder.binding.message.setVisibility(View.GONE);
                 viewHolder.binding.voicePlayerView.setAudio(message.getMessage());
+
+
 //                new Thread(new Runnable() {
 //                    @Override
 //                    public void run() {

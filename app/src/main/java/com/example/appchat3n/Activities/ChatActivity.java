@@ -318,7 +318,7 @@ public class ChatActivity extends AppCompatActivity {
                 binding.recordButton.setVisibility(View.GONE);
 
                 if(binding.messageBox.getText().toString().trim().equals("")) {
-                    binding.sendBtn.setVisibility(View.GONE);
+                   binding.sendBtn.setVisibility(View.GONE);
                     binding.recordButton.setVisibility(View.VISIBLE);
                 }
                 database.getReference().child("presence").child(senderUid).setValue("Typing...");
@@ -392,9 +392,11 @@ public class ChatActivity extends AppCompatActivity {
     private void showSmartReply(Message messages) {
         conversation.clear();
         cgSmartReplies.removeAllViews();
+        binding.llSmartReplies.setVisibility(View.GONE);
         conversation.add(TextMessage.createForRemoteUser(messages.getMessage(),System.currentTimeMillis(), senderUid));
        if(messages.getSenderId().equals(receiverUid)) {
            if (!conversation.isEmpty()) {
+               binding.llSmartReplies.setVisibility(View.VISIBLE);
                SmartReplyGenerator smartReply = SmartReply.getClient();
                smartReply.suggestReplies(conversation).addOnSuccessListener(new OnSuccessListener<SmartReplySuggestionResult>() {
                    @Override
@@ -436,165 +438,165 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    private void initView() {
+        private void initView() {
 
-        binding.recordButton.setRecordView(binding.recordView);
-        binding.recordButton.setListenForRecord(false);
+            binding.recordButton.setRecordView(binding.recordView);
+            binding.recordButton.setListenForRecord(false);
 
-        binding.recordButton.setOnClickListener(view -> {
+            binding.recordButton.setOnClickListener(view -> {
 
-            if (permissions.isRecordingOk(ChatActivity.this))
-                if (permissions.isStorageOk(ChatActivity.this))
-                    binding.recordButton.setListenForRecord(true);
-                else permissions.requestStorage(ChatActivity.this);
-            else permissions.requestRecording(ChatActivity.this);
-
-
-        });
-
-        binding.recordView.setOnRecordListener(new OnRecordListener() {
-            @Override
-            public void onStart() {
-                //Start Recording..
-                Log.d("RecordView", "onStart");
-
-                setUpRecording();
-
-                try {
-                    mediaRecorder.prepare();
-                    mediaRecorder.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                binding.messageBox.setVisibility(View.GONE);
-                binding.recordView.setVisibility(View.VISIBLE);
-
-            }
-
-            @Override
-            public void onCancel() {
-                //On Swipe To Cancel
-                Log.d("RecordView", "onCancel");
-
-                mediaRecorder.reset();
-                mediaRecorder.release();
-                File file = new File(audioPath);
-                if (file.exists())
-                    file.delete();
-
-                binding.recordView.setVisibility(View.GONE);
-                binding.messageBox.setVisibility(View.VISIBLE);
+                if (permissions.isRecordingOk(ChatActivity.this))
+                    if (permissions.isStorageOk(ChatActivity.this))
+                        binding.recordButton.setListenForRecord(true);
+                    else permissions.requestStorage(ChatActivity.this);
+                else permissions.requestRecording(ChatActivity.this);
 
 
-            }
+            });
 
-            @Override
-            public void onFinish(long recordTime) {
-                //Stop Recording..
-                Log.d("RecordView", "onFinish");
+            binding.recordView.setOnRecordListener(new OnRecordListener() {
+                @Override
+                public void onStart() {
+                    //Start Recording..
+                    Log.d("RecordView", "onStart");
 
-                try {
-                    mediaRecorder.stop();
-                    mediaRecorder.release();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    setUpRecording();
 
-
-                binding.recordView.setVisibility(View.GONE);
-                binding.messageBox.setVisibility(View.VISIBLE);
-
-                sendRecodingMessage(audioPath);
-
-
-            }
-
-            @Override
-            public void onLessThanSecond() {
-                //When the record time is less than One Second
-                Log.d("RecordView", "onLessThanSecond");
-
-                mediaRecorder.reset();
-                mediaRecorder.release();
-
-                File file = new File(audioPath);
-                if (file.exists())
-                    file.delete();
-
-
-                binding.recordView.setVisibility(View.GONE);
-                //binding.dataLayout.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    private void setUpRecording() {
-
-        mediaRecorder = new MediaRecorder();
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "ChatsApp/Media/Recording");
-
-        if (!file.exists())
-            file.mkdirs();
-        audioPath = file.getAbsolutePath() + File.separator + System.currentTimeMillis() + ".3gp";
-
-        mediaRecorder.setOutputFile(audioPath);
-    }
-
-    private void sendRecodingMessage(String audioPath) {
-
-
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference(  "Media/Recording/" + senderUid + "/" + System.currentTimeMillis());
-            Uri audioFile = Uri.fromFile(new File(audioPath));
-            storageReference.putFile(audioFile).addOnSuccessListener(success -> {
-                Task<Uri> audioUrl = success.getStorage().getDownloadUrl();
-
-                audioUrl.addOnCompleteListener(path -> {
-                    if (path.isSuccessful()) {
-
-                        String url = path.getResult().toString();
-
-
-                        Date date = new Date();
-                        Message message = new Message(url, senderUid, date.getTime(), "recording");
-
-                        String randomKey = database.getReference().push().getKey();
-
-                        HashMap<String, Object> lastMsgObj = new HashMap<>();
-                        lastMsgObj.put("lastMsg", "audio");
-                        lastMsgObj.put("lastMsgTime", date.getTime());
-
-                        database.getReference().child("chatLists").child(senderUid).child(receiverUid).updateChildren(lastMsgObj);
-                        database.getReference().child("chatLists").child(receiverUid).child(senderUid).updateChildren(lastMsgObj);
-
-                        database.getReference().child("chatMessages")
-                                .child(senderUid)
-                                .child(receiverUid)
-                                .child(randomKey)
-                                .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                database.getReference().child("chatMessages")
-                                        .child(receiverUid)
-                                        .child(senderUid)
-                                        .child(randomKey)
-                                        .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        sendNotification(name, "audio", token);
-                                    }
-                                });
-                            }
-                        });
-
+                    try {
+                        mediaRecorder.prepare();
+                        mediaRecorder.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                });
+
+                    binding.messageBox.setVisibility(View.GONE);
+                    binding.recordView.setVisibility(View.VISIBLE);
+
+                }
+
+                @Override
+                public void onCancel() {
+                    //On Swipe To Cancel
+                    Log.d("RecordView", "onCancel");
+
+                    mediaRecorder.reset();
+                    mediaRecorder.release();
+                    File file = new File(audioPath);
+                    if (file.exists())
+                        file.delete();
+
+                    binding.recordView.setVisibility(View.GONE);
+                    binding.messageBox.setVisibility(View.VISIBLE);
+
+
+                }
+
+                @Override
+                public void onFinish(long recordTime) {
+                    //Stop Recording..
+                    Log.d("RecordView", "onFinish");
+
+                    try {
+                        mediaRecorder.stop();
+                        mediaRecorder.release();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                    binding.recordView.setVisibility(View.GONE);
+                    binding.messageBox.setVisibility(View.VISIBLE);
+
+                    sendRecodingMessage(audioPath);
+
+
+                }
+
+                @Override
+                public void onLessThanSecond() {
+                    //When the record time is less than One Second
+                    Log.d("RecordView", "onLessThanSecond");
+
+                    mediaRecorder.reset();
+                    mediaRecorder.release();
+
+                    File file = new File(audioPath);
+                    if (file.exists())
+                        file.delete();
+
+
+                    binding.recordView.setVisibility(View.GONE);
+                    //binding.dataLayout.setVisibility(View.VISIBLE);
+                }
             });
         }
+
+        private void setUpRecording() {
+
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "ChatsApp/Media/Recording");
+
+            if (!file.exists())
+                file.mkdirs();
+            audioPath = file.getAbsolutePath() + File.separator + System.currentTimeMillis() + ".3gp";
+
+            mediaRecorder.setOutputFile(audioPath);
+        }
+
+        private void sendRecodingMessage(String audioPath) {
+
+
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference(  "Media/Recording/" + senderUid + "/" + System.currentTimeMillis());
+                Uri audioFile = Uri.fromFile(new File(audioPath));
+                storageReference.putFile(audioFile).addOnSuccessListener(success -> {
+                    Task<Uri> audioUrl = success.getStorage().getDownloadUrl();
+
+                    audioUrl.addOnCompleteListener(path -> {
+                        if (path.isSuccessful()) {
+
+                            String url = path.getResult().toString();
+
+
+                            Date date = new Date();
+                            Message message = new Message(url, senderUid, date.getTime(), "recording");
+
+                            String randomKey = database.getReference().push().getKey();
+
+                            HashMap<String, Object> lastMsgObj = new HashMap<>();
+                            lastMsgObj.put("lastMsg", "audio");
+                            lastMsgObj.put("lastMsgTime", date.getTime());
+
+                            database.getReference().child("chatLists").child(senderUid).child(receiverUid).updateChildren(lastMsgObj);
+                            database.getReference().child("chatLists").child(receiverUid).child(senderUid).updateChildren(lastMsgObj);
+
+                            database.getReference().child("chatMessages")
+                                    .child(senderUid)
+                                    .child(receiverUid)
+                                    .child(randomKey)
+                                    .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    database.getReference().child("chatMessages")
+                                            .child(receiverUid)
+                                            .child(senderUid)
+                                            .child(randomKey)
+                                            .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            sendNotification(name, "audio", token);
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                    });
+                });
+            }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
