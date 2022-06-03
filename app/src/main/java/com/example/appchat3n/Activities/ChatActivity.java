@@ -314,13 +314,13 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                binding.sendBtn.setVisibility(View.VISIBLE);
-                binding.recordButton.setVisibility(View.GONE);
-
-                if(binding.messageBox.getText().toString().trim().equals("")) {
-                   binding.sendBtn.setVisibility(View.GONE);
-                    binding.recordButton.setVisibility(View.VISIBLE);
-                }
+//                binding.sendBtn.setVisibility(View.VISIBLE);
+//                binding.recordButton.setVisibility(View.GONE);
+//
+//                if(binding.messageBox.getText().toString().trim().equals("")) {
+//                   binding.sendBtn.setVisibility(View.GONE);
+//                    binding.recordButton.setVisibility(View.VISIBLE);
+//                }
                 database.getReference().child("presence").child(senderUid).setValue("Typing...");
                 handler.removeCallbacks(null);
                 handler.postDelayed(userStopTyping, 1000);
@@ -568,6 +568,8 @@ public class ChatActivity extends AppCompatActivity {
 
                             HashMap<String, Object> lastMsgObj = new HashMap<>();
                             lastMsgObj.put("lastMsg", "audio");
+                            lastMsgObj.put("senderUid", senderUid);
+
                             lastMsgObj.put("lastMsgTime", date.getTime());
 
                             database.getReference().child("chatLists").child(senderUid).child(receiverUid).updateChildren(lastMsgObj);
@@ -634,6 +636,8 @@ public class ChatActivity extends AppCompatActivity {
                                                 HashMap<String, Object> lastMsgObj = new HashMap<>();
                                                 lastMsgObj.put("lastMsg", message.getMessage());
                                                 lastMsgObj.put("lastMsgTime", date.getTime());
+                                                lastMsgObj.put("senderUid", senderUid);
+
 
                                                 database.getReference().child("chatLists").child(senderUid).child(receiverUid).updateChildren(lastMsgObj);
                                                 database.getReference().child("chatLists").child(receiverUid).child(senderUid).updateChildren(lastMsgObj);
@@ -700,7 +704,7 @@ public class ChatActivity extends AppCompatActivity {
                                             HashMap<String, Object> lastMsgObj = new HashMap<>();
                                             lastMsgObj.put("lastMsg", message.getMessage());
                                             lastMsgObj.put("lastMsgTime", date.getTime());
-
+                                            lastMsgObj.put("senderUid", senderUid);
                                             database.getReference().child("chatLists").child(senderUid).child(receiverUid).updateChildren(lastMsgObj);
                                             database.getReference().child("chatLists").child(receiverUid).child(senderUid).updateChildren(lastMsgObj);
 
