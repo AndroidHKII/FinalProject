@@ -31,6 +31,7 @@
             android:maxWidth="250dp"
             android:paddingLeft="15dp"
             android:paddingTop="5dp"
+            android:textColor="@color/white"
             android:paddingRight="10dp"
             android:paddingBottom="5dp"
             android:text="TextView"
